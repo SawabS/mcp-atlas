@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useDeferredValue, useMemo, useState } from "react";
-import { ArrowRight, BookOpenText, FileText, GitBranch, Network, Search, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, FileText, GitBranch, Network, Search } from "lucide-react";
 import type { AtlasGraphEdge, AtlasGraphGroup, AtlasGraphNode } from "@/components/atlas/graph-types";
 import type { GraphData, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
@@ -25,10 +25,9 @@ type ConceptGraphProps = {
   theme: "dark" | "light";
   onExplore: (concept: string) => void;
   onOpenDocument: (id: string) => void;
-  onAsk: (question: string) => void;
 };
 
-export function ConceptGraph({ graph, documents, theme, onExplore, onOpenDocument, onAsk }: ConceptGraphProps) {
+export function ConceptGraph({ graph, documents, theme, onExplore, onOpenDocument }: ConceptGraphProps) {
   const [mode, setMode] = useState<"concepts" | "notes">("concepts");
   const [selectedId, setSelectedId] = useState("");
   const [query, setQuery] = useState("");
@@ -125,18 +124,18 @@ export function ConceptGraph({ graph, documents, theme, onExplore, onOpenDocumen
         </div>
         <aside className="concept-panel" aria-live="polite">
           {selected?.kind === "document"
-            ? <DocumentDetail node={selected} related={related} onSelect={setSelectedId} onOpenDocument={onOpenDocument} onAsk={onAsk} />
-            : selected && <ConceptDetail node={selected} related={related} onSelect={setSelectedId} onExplore={onExplore} onAsk={onAsk} />}
+            ? <DocumentDetail node={selected} related={related} onSelect={setSelectedId} onOpenDocument={onOpenDocument} />
+            : selected && <ConceptDetail node={selected} related={related} onSelect={setSelectedId} onExplore={onExplore} />}
         </aside>
       </div>
     </div>
   );
 }
 
-function ConceptDetail({ node, related, onSelect, onExplore, onAsk }: { node: AtlasGraphNode; related: AtlasGraphNode[]; onSelect: (id: string) => void; onExplore: (concept: string) => void; onAsk: (question: string) => void }) {
-  return <><div className={`concept-symbol group-${node.group}`}><Network size={22} /></div><span className="eyebrow">{groupLabels[node.group]}</span><h2>{node.label}</h2><p>{node.summary}</p><div className="related-concepts"><span className="eyebrow">Direct connections</span>{related.map((item) => <button key={item.id} type="button" onClick={() => onSelect(item.id)}><i className={`group-${item.group}`} /><span>{item.label}</span><small>{item.kind === "document" ? "note" : "concept"}</small></button>)}</div><div className="concept-actions"><button className="primary-action" type="button" onClick={() => onExplore(node.label)}>Explore sources <ArrowRight size={15} /></button><button className="secondary-action" type="button" onClick={() => onAsk(`Explain ${node.label} in MCP and how it connects to ${related.filter((item) => item.kind === "concept").slice(0, 3).map((item) => item.label).join(", ")}.`)}><Sparkles size={15} /> Ask Atlas</button></div></>;
+function ConceptDetail({ node, related, onSelect, onExplore }: { node: AtlasGraphNode; related: AtlasGraphNode[]; onSelect: (id: string) => void; onExplore: (concept: string) => void }) {
+  return <><div className={`concept-symbol group-${node.group}`}><Network size={22} /></div><span className="eyebrow">{groupLabels[node.group]}</span><h2>{node.label}</h2><p>{node.summary}</p><div className="related-concepts"><span className="eyebrow">Direct connections</span>{related.map((item) => <button key={item.id} type="button" onClick={() => onSelect(item.id)}><i className={`group-${item.group}`} /><span>{item.label}</span><small>{item.kind === "document" ? "note" : "concept"}</small></button>)}</div><div className="concept-actions"><button className="primary-action" type="button" onClick={() => onExplore(node.label)}>Explore sources <ArrowRight size={15} /></button></div></>;
 }
 
-function DocumentDetail({ node, related, onSelect, onOpenDocument, onAsk }: { node: AtlasGraphNode; related: AtlasGraphNode[]; onSelect: (id: string) => void; onOpenDocument: (id: string) => void; onAsk: (question: string) => void }) {
-  return <><div className="concept-symbol group-document"><BookOpenText size={22} /></div><span className="eyebrow">{node.category}</span><h2>{node.label}</h2><p>{node.summary}</p>{node.sourcePath && <code className="graph-source-path">{node.sourcePath}</code>}<div className="related-concepts"><span className="eyebrow">Connected concepts</span>{related.map((item) => <button key={item.id} type="button" onClick={() => onSelect(item.id)}><i className={`group-${item.group}`} /><span>{item.label}</span><small>concept</small></button>)}</div><div className="concept-actions"><button className="primary-action" type="button" onClick={() => node.documentId && onOpenDocument(node.documentId)}>Open source note <BookOpenText size={15} /></button><button className="secondary-action" type="button" onClick={() => onAsk(`Summarize the MCP source titled ${node.label} and explain its practical importance.`)}><Sparkles size={15} /> Ask Atlas</button></div></>;
+function DocumentDetail({ node, related, onSelect, onOpenDocument }: { node: AtlasGraphNode; related: AtlasGraphNode[]; onSelect: (id: string) => void; onOpenDocument: (id: string) => void }) {
+  return <><div className="concept-symbol group-document"><BookOpenText size={22} /></div><span className="eyebrow">{node.category}</span><h2>{node.label}</h2><p>{node.summary}</p>{node.sourcePath && <code className="graph-source-path">{node.sourcePath}</code>}<div className="related-concepts"><span className="eyebrow">Connected concepts</span>{related.map((item) => <button key={item.id} type="button" onClick={() => onSelect(item.id)}><i className={`group-${item.group}`} /><span>{item.label}</span><small>concept</small></button>)}</div><div className="concept-actions"><button className="primary-action" type="button" onClick={() => node.documentId && onOpenDocument(node.documentId)}>Open source note <BookOpenText size={15} /></button></div></>;
 }

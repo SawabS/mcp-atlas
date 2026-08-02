@@ -10,6 +10,7 @@ import { PromptInput, PromptInputBody, PromptInputFooter, PromptInputSubmit, Pro
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import { chatEndpoint } from "@/lib/client-data";
+import { displayMarkdown, displayText } from "@/lib/display-text";
 
 const starterPrompts = ["Explain MCP architecture", "Tools versus resources", "Secure remote servers"];
 const citationLinkSafety = { enabled: false } as const;
@@ -24,13 +25,13 @@ function linkCitations(text: string, sources: Array<{ sourceId: string; url: str
 
 type ChatPanelProps = {
   open: boolean;
-  initialQuestion: string;
+  initialQuestion: { id: number; text: string } | null;
   dock: "left" | "right";
   width: number;
   onClose: () => void;
   onDockChange: (dock: "left" | "right") => void;
   onResize: (width: number) => void;
-  onQuestionConsumed: () => void;
+  onQuestionConsumed: (id: number) => void;
 };
 
 export function ChatPanel({ open, initialQuestion, dock, width, onClose, onDockChange, onResize, onQuestionConsumed }: ChatPanelProps) {
@@ -39,6 +40,7 @@ export function ChatPanel({ open, initialQuestion, dock, width, onClose, onDockC
   const [input, setInput] = useState("");
   const panelRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const consumedQuestionRef = useRef<number | null>(null);
   const transport = useMemo(() => new DefaultChatTransport({ api: chatEndpoint(), body: { model } }), [model]);
   const { messages, sendMessage, status, stop, error, setMessages } = useChat({ transport });
   const isBusy = status === "submitted" || status === "streaming";
@@ -59,10 +61,10 @@ export function ChatPanel({ open, initialQuestion, dock, width, onClose, onDockC
   }, [open]);
 
   useEffect(() => {
-    if (open && initialQuestion) {
-      sendMessage({ text: initialQuestion });
-      onQuestionConsumed();
-    }
+    if (!open || !initialQuestion || consumedQuestionRef.current === initialQuestion.id) return;
+    consumedQuestionRef.current = initialQuestion.id;
+    onQuestionConsumed(initialQuestion.id);
+    sendMessage({ text: initialQuestion.text });
   }, [initialQuestion, onQuestionConsumed, open, sendMessage]);
 
   const submit = (text: string) => {
@@ -108,12 +110,12 @@ export function ChatPanel({ open, initialQuestion, dock, width, onClose, onDockC
           const sources = message.parts.filter((part) => part.type === "source-url");
           const texts = message.parts.filter((part) => part.type === "text");
           const animateResponse = isBusy && messageIndex === messages.length - 1 && message.role === "assistant";
-          return <Message from={message.role} key={message.id} className="atlas-message"><div className="message-role">{message.role === "user" ? "You" : <><span><Sparkles size={12} /></span> Atlas</>}</div><MessageContent>{texts.map((part, index) => message.role === "assistant" ? <MessageResponse key={index} linkSafety={citationLinkSafety} isAnimating={animateResponse} lineNumbers>{linkCitations(part.text, sources)}</MessageResponse> : <p key={index}>{part.text}</p>)}</MessageContent>{sources.length > 0 && <Sources><SourcesTrigger count={sources.length} /><SourcesContent>{sources.map((source) => <Source key={source.sourceId} href={source.url} title={source.title}><span className="source-number">{source.sourceId}</span><span>{source.title}</span><ExternalLink size={12} /></Source>)}</SourcesContent></Sources>}{message.role === "assistant" && texts.length > 0 && <MessageActions><MessageAction tooltip="Copy answer" onClick={() => navigator.clipboard.writeText(texts.map((part) => part.text).join("\n"))}><Copy size={14} /></MessageAction></MessageActions>}</Message>;
+          return <Message from={message.role} key={message.id} className="atlas-message"><div className="message-role">{message.role === "user" ? "You" : <><span><Sparkles size={12} /></span> Atlas</>}</div><MessageContent>{texts.map((part, index) => message.role === "assistant" ? <MessageResponse key={index} linkSafety={citationLinkSafety} isAnimating={animateResponse} lineNumbers>{displayMarkdown(linkCitations(part.text, sources))}</MessageResponse> : <p key={index}>{displayText(part.text)}</p>)}</MessageContent>{sources.length > 0 && <Sources><SourcesTrigger count={sources.length} /><SourcesContent>{sources.map((source) => { const title = displayText(source.title ?? source.sourceId); return <Source key={source.sourceId} href={source.url} title={title}><span className="source-number">{source.sourceId}</span><span>{title}</span><ExternalLink size={12} /></Source>; })}</SourcesContent></Sources>}{message.role === "assistant" && texts.length > 0 && <MessageActions><MessageAction tooltip="Copy answer" onClick={() => navigator.clipboard.writeText(displayMarkdown(texts.map((part) => part.text).join("\n")))}><Copy size={14} /></MessageAction></MessageActions>}</Message>;
         })}
         {isBusy && <div className="chat-thinking" role="status" aria-live="polite"><span className="chat-thinking-dots" aria-hidden="true"><i /><i /><i /></span><span>{status === "submitted" ? "Retrieving the most relevant sources" : "Atlas is writing a grounded answer"}</span></div>}
         {error && <div className="chat-error"><strong>Atlas could not answer</strong><span>{error.message}</span></div>}
       </ConversationContent><ConversationScrollButton /></Conversation>
-      <div className="chat-composer"><PromptInput onSubmit={(message) => submit(message.text)}><PromptInputBody><PromptInputTextarea value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about MCP..." aria-label="Ask Atlas a question" /></PromptInputBody><PromptInputFooter><PromptInputTools><span className="grounding-chip"><span className="status-dot" /> Source grounding on</span>{messages.length > 0 && <button className="reset-chat" type="button" onClick={() => setMessages([])}><RotateCcw size={13} /> Clear</button>}</PromptInputTools><PromptInputSubmit status={status} onStop={stop} disabled={!input.trim() && !isBusy} /></PromptInputFooter></PromptInput><p>Atlas can make mistakes. Verify critical details using the linked sources.</p></div>
+      <div className="chat-composer"><PromptInput onSubmit={(message) => submit(message.text)}><PromptInputBody><PromptInputTextarea value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about MCP..." aria-label="Ask Atlas a question" /></PromptInputBody><PromptInputFooter className={messages.length > 0 ? undefined : "justify-end"}>{messages.length > 0 && <PromptInputTools><button className="reset-chat" type="button" onClick={() => setMessages([])}><RotateCcw size={13} /> Clear</button></PromptInputTools>}<PromptInputSubmit status={status} onStop={stop} disabled={!input.trim() && !isBusy} /></PromptInputFooter></PromptInput><p>Atlas can make mistakes. Verify critical details using the linked sources.</p></div>
     </aside>
   );
 }

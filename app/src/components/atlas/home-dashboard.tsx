@@ -1,23 +1,17 @@
 "use client";
 
-import { ArrowRight, BookMarked, Braces, Database, Radio, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BookMarked, Braces, Database, GitCommitHorizontal, Radio, ShieldCheck } from "lucide-react";
+import { BrandGlyph } from "@/components/atlas/brand-mark";
 import type { CorpusStats, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
-
-const prompts = [
-  "How does capability negotiation work?",
-  "Compare tools, resources, and prompts",
-  "How should I secure a remote MCP server?",
-];
 
 type HomeDashboardProps = {
   stats: CorpusStats | null;
   documents: KnowledgeDocumentSummary[];
   onOpenLibrary: (category?: string) => void;
   onOpenDocument: (id: string) => void;
-  onAsk: (question: string) => void;
 };
 
-export function HomeDashboard({ stats, documents, onOpenLibrary, onOpenDocument, onAsk }: HomeDashboardProps) {
+export function HomeDashboard({ stats, documents, onOpenLibrary, onOpenDocument }: HomeDashboardProps) {
   const featured = documents.filter((document) => document.sourcePath.includes("2026-07-28") && document.category === "Specification").slice(0, 4);
   const categoryCards = [
     { label: "Specification", value: stats?.categories.Specification, icon: Braces, color: "mint" },
@@ -35,8 +29,8 @@ export function HomeDashboard({ stats, documents, onOpenLibrary, onOpenDocument,
           <h1>Understand the protocol.<br /><span>Follow every connection.</span></h1>
           <p>Explore the specification, SDKs, servers, and Registry through a source-linked knowledge atlas built for people and AI.</p>
           <div className="hero-actions">
-            <button className="primary-action" type="button" onClick={() => onAsk(prompts[0])}><Sparkles size={17} /> Ask Atlas</button>
-            <button className="secondary-action" type="button" onClick={() => onOpenLibrary()}><BookMarked size={17} /> Browse knowledge</button>
+            <button className="primary-action" type="button" onClick={() => onOpenLibrary()}><BookMarked size={17} /> Browse knowledge</button>
+            <button className="secondary-action" type="button" onClick={() => onOpenLibrary("Specification")}><Braces size={17} /> Read the specification</button>
           </div>
           <div className="trust-row"><ShieldCheck size={15} /><span>Answers grounded in exact commits</span><i /><span>{stats?.retrievalChunks.toLocaleString() ?? "..."} searchable passages</span></div>
         </div>
@@ -45,13 +39,7 @@ export function HomeDashboard({ stats, documents, onOpenLibrary, onOpenDocument,
           <div className="orbit orbit-two"><span /></div>
           <div className="orbit orbit-three"><span /></div>
           <div className="protocol-core">
-            <svg className="protocol-core-mark" viewBox="0 0 48 42" role="presentation">
-              <path className="brand-edge" d="M7 34 24 7l17 27Z" />
-              <path className="brand-flow" d="M7 34 24 7l17 27Z" />
-              <circle className="brand-node" cx="7" cy="34" r="4" />
-              <circle className="brand-node brand-node-live" cx="24" cy="7" r="4" />
-              <circle className="brand-node" cx="41" cy="34" r="4" />
-            </svg>
+            <BrandGlyph className="protocol-core-mark" />
             <small>MCP</small>
           </div>
           <div className="orbit-label label-tools">Tools</div>
@@ -91,11 +79,13 @@ export function HomeDashboard({ stats, documents, onOpenLibrary, onOpenDocument,
             ))}
           </div>
         </div>
-        <div className="ask-card">
-          <div className="ask-card-head"><div className="atlas-avatar"><Sparkles size={20} /></div><div><span className="eyebrow">Atlas assistant</span><h2>Ask the protocol</h2></div></div>
-          <p>Get a focused answer with exact source links and commit-level provenance.</p>
+        <div className="ask-card provenance-card">
+          <div className="ask-card-head"><div className="atlas-avatar"><GitCommitHorizontal size={20} /></div><div><span className="eyebrow">Provenance first</span><h2>Trace every claim</h2></div></div>
+          <p>Every knowledge note keeps its repository, source path, license, and exact commit attached.</p>
           <div className="prompt-stack">
-            {prompts.map((prompt) => <button key={prompt} type="button" onClick={() => onAsk(prompt)}><span>{prompt}</span><ArrowRight size={15} /></button>)}
+            <button type="button" onClick={() => onOpenLibrary("Specification")}><span>Read current specification sources</span><ArrowRight size={15} /></button>
+            <button type="button" onClick={() => onOpenLibrary("SDKs")}><span>Compare official SDK documentation</span><ArrowRight size={15} /></button>
+            <button type="button" onClick={() => onOpenLibrary("Reference servers")}><span>Inspect reference implementations</span><ArrowRight size={15} /></button>
           </div>
         </div>
       </section>

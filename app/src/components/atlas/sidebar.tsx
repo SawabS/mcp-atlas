@@ -2,12 +2,11 @@
 
 import {
   BookOpenText,
-  Boxes,
   GitBranch,
   Home,
-  MessageCircleMore,
   Moon,
   PanelLeftClose,
+  PanelLeftOpen,
   Search,
   Server,
   Sparkles,
@@ -34,7 +33,6 @@ type SidebarProps = {
   onCollapse: () => void;
   onNavigate: (view: AtlasView) => void;
   onSearch: () => void;
-  onChat: () => void;
   onToggleTheme: () => void;
 };
 
@@ -47,7 +45,6 @@ export function Sidebar({
   onCollapse,
   onNavigate,
   onSearch,
-  onChat,
   onToggleTheme,
 }: SidebarProps) {
   return (
@@ -95,9 +92,6 @@ export function Sidebar({
           <span className="eyebrow">Knowledge pulse</span>
           <strong>{stats?.retrievalChunks.toLocaleString() ?? "..."} grounded passages</strong>
           <p>Every answer traces back to an exact official source.</p>
-          <button type="button" onClick={onChat}>
-            Ask Atlas <MessageCircleMore size={15} />
-          </button>
         </div>
       )}
 
@@ -112,7 +106,7 @@ export function Sidebar({
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         <button className="collapse-button" type="button" onClick={onCollapse} aria-label="Toggle sidebar">
-          {collapsed ? <Boxes size={18} /> : <PanelLeftClose size={18} />}
+          {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={18} />}
         </button>
       </div>
     </aside>

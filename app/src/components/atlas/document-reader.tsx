@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { defaultUrlTransform } from "streamdown";
 import { ArrowLeft, Bot, CheckCircle2, ExternalLink, FileCode2, GitCommitHorizontal, LoaderCircle, Scale, X } from "lucide-react";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { loadDocument } from "@/lib/client-data";
+import { documentAssetUrl } from "@/lib/display-text";
 import type { KnowledgeDocument } from "@/lib/knowledge-types";
 
 type DocumentReaderProps = {
@@ -44,7 +46,11 @@ export function DocumentReader({ documentId, onClose, onAsk }: DocumentReaderPro
               </div>
             </div>
             <div className="markdown-document">
-              <MessageResponse mode="static" lineNumbers>
+              <MessageResponse
+                mode="static"
+                lineNumbers
+                urlTransform={(url, key, node) => defaultUrlTransform(documentAssetUrl(url, document), key, node)}
+              >
                 {document.content}
               </MessageResponse>
             </div>
@@ -54,7 +60,7 @@ export function DocumentReader({ documentId, onClose, onAsk }: DocumentReaderPro
             <div className="metadata-item"><GitCommitHorizontal size={16} /><span><small>Commit</small><code>{document.commit?.slice(0, 12) ?? "registry"}</code></span></div>
             <div className="metadata-item"><FileCode2 size={16} /><span><small>Source type</small><b>{document.documentType}</b></span></div>
             <div className="metadata-item"><Scale size={16} /><span><small>Licence</small><b>{document.license ?? "Not reported"}</b></span></div>
-            <div className="reader-outline"><span className="eyebrow">On this page</span>{document.headings.slice(0, 14).map((heading) => <span key={heading}>{heading}</span>)}</div>
+            <div className="reader-outline"><span className="eyebrow">On this page</span>{document.headings.slice(0, 14).map((heading, index) => <span key={`${heading}-${index}`}>{heading}</span>)}</div>
             <div className="reader-concepts"><span className="eyebrow">Connected concepts</span><div>{document.concepts.map((concept) => <span key={concept}>{concept}</span>)}</div></div>
           </aside>
         </div>

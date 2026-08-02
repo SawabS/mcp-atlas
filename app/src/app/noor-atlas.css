@@ -79,6 +79,16 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+[data-theme="light"] ::selection {
+  color: #ffffff;
+  background: #295ec7;
+}
+
+[data-theme="dark"] ::selection {
+  color: #101010;
+  background: #9ec2ff;
+}
+
 button,
 input,
 select,
@@ -224,41 +234,82 @@ textarea {
   overflow: visible;
 }
 
+.brand-glyph {
+  --brand-red: #f0525f;
+  --brand-blue: #3b82f6;
+  --brand-green: #20b96b;
+  overflow: visible;
+}
+
 .brand-edge {
   fill: none;
   stroke: var(--n-text-muted);
   stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.brand-flow {
+.brand-energy-segment {
   fill: none;
-  stroke: var(--n-info);
-  stroke-width: 1.7;
+  stroke-width: 2;
   stroke-linecap: round;
-  stroke-dasharray: 3 16;
-  animation: brand-energy 2.2s linear infinite;
+  stroke-dasharray: 14 100;
+  opacity: 0;
+  filter: drop-shadow(0 0 2.5px currentColor);
+  animation: brand-energy-flow 6s var(--n-ease-standard) infinite both;
+}
+
+.brand-energy-red {
+  color: var(--brand-red);
+}
+
+.brand-energy-blue {
+  color: var(--brand-blue);
+  animation-delay: -4s;
+}
+
+.brand-energy-green {
+  color: var(--brand-green);
+  animation-delay: -2s;
 }
 
 .brand-node {
-  fill: var(--n-surface);
-  stroke: var(--n-text-secondary);
-  stroke-width: 1.4;
-}
-
-.brand-node-live {
-  fill: var(--n-info);
-  stroke: var(--n-info);
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--n-info) 74%, transparent));
+  stroke-width: 1.15;
+  transform-box: fill-box;
   transform-origin: center;
-  animation: brand-node-pulse 2.2s var(--n-ease-standard) infinite;
+  animation: brand-node-receive 6s var(--n-ease-standard) infinite both;
 }
 
-@keyframes brand-energy {
-  to { stroke-dashoffset: -38; }
+.brand-node-red {
+  fill: var(--brand-red);
+  stroke: color-mix(in srgb, var(--brand-red) 68%, white);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--brand-red) 72%, transparent));
+  animation-delay: -2s;
 }
 
-@keyframes brand-node-pulse {
-  50% { opacity: 0.62; }
+.brand-node-blue {
+  fill: var(--brand-blue);
+  stroke: color-mix(in srgb, var(--brand-blue) 68%, white);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--brand-blue) 72%, transparent));
+}
+
+.brand-node-green {
+  fill: var(--brand-green);
+  stroke: color-mix(in srgb, var(--brand-green) 68%, white);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--brand-green) 72%, transparent));
+  animation-delay: -4s;
+}
+
+@keyframes brand-energy-flow {
+  0%, 2% { opacity: 0; stroke-dashoffset: 0; }
+  5% { opacity: 1; }
+  27% { opacity: 1; stroke-dashoffset: -86; }
+  32%, 100% { opacity: 0; stroke-dashoffset: -100; }
+}
+
+@keyframes brand-node-receive {
+  0%, 22%, 36%, 100% { transform: scale(1); }
+  28% { transform: scale(1.42); }
 }
 
 .search-launch {
@@ -374,6 +425,20 @@ textarea {
 
 .sidebar-footer {
   border-color: var(--n-border);
+}
+
+.atlas-sidebar.is-collapsed .sidebar-footer {
+  display: grid;
+  grid-template-columns: repeat(2, 26px);
+  gap: 4px;
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.atlas-sidebar.is-collapsed .collapse-button {
+  width: 26px;
+  height: 32px;
+  border-radius: var(--n-radius-xs);
 }
 
 .sync-status strong {
@@ -546,8 +611,8 @@ textarea {
   height: 310px;
 }
 
-.orbit {
-  border-color: var(--n-border);
+.orbit-one {
+  border-color: color-mix(in srgb, #f0525f 24%, var(--n-border));
 }
 
 .orbit-one {
@@ -556,28 +621,32 @@ textarea {
 }
 
 .orbit-two {
+  border-color: color-mix(in srgb, #3b82f6 24%, var(--n-border));
   animation-duration: 24s;
   animation-delay: -11s;
 }
 
 .orbit-three {
+  border-color: color-mix(in srgb, #20b96b 25%, var(--n-border));
   animation-duration: 36s;
   animation-delay: -24s;
 }
 
 .orbit span {
-  background: var(--n-info);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--n-info) 48%, transparent);
+  width: 9px;
+  height: 9px;
+  background: #f0525f;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #f0525f 12%, transparent), 0 0 11px color-mix(in srgb, #f0525f 65%, transparent);
 }
 
 .orbit-two span {
-  background: var(--n-text-secondary);
-  box-shadow: none;
+  background: #3b82f6;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #3b82f6 12%, transparent), 0 0 11px color-mix(in srgb, #3b82f6 65%, transparent);
 }
 
 .orbit-three span {
-  background: var(--n-warning);
-  box-shadow: none;
+  background: #20b96b;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #20b96b 12%, transparent), 0 0 11px color-mix(in srgb, #20b96b 65%, transparent);
 }
 
 .protocol-core {
@@ -590,8 +659,8 @@ textarea {
 }
 
 .protocol-core-mark {
-  width: 48px;
-  height: 42px;
+  width: 54px;
+  height: 54px;
   overflow: visible;
 }
 
@@ -599,9 +668,8 @@ textarea {
   stroke-width: 1.2;
 }
 
-.protocol-core-mark .brand-flow {
-  stroke-width: 1.55;
-  stroke-dasharray: 4 18;
+.protocol-core-mark .brand-energy-segment {
+  stroke-width: 1.75;
 }
 
 .protocol-core-mark .brand-node {
@@ -625,6 +693,7 @@ textarea {
   color: var(--n-text-secondary);
   background: var(--n-surface);
   box-shadow: var(--n-shadow-xs);
+  font-size: 11px;
 }
 
 .section-block,
@@ -1056,18 +1125,67 @@ textarea {
 }
 
 .chat-resize-handle {
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  color: var(--n-text-muted);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  touch-action: none;
+}
+
+.chat-panel.dock-right .chat-resize-handle {
+  left: -8px;
+}
+
+.chat-panel.dock-left .chat-resize-handle {
+  right: -8px;
+}
+
+.chat-resize-handle::before {
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 2px;
+  background: var(--n-info);
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity var(--n-duration-fast) var(--n-ease-standard);
+  content: "";
+}
+
+.chat-resize-handle svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 20px;
   height: 64px;
-  border-color: var(--n-border-strong);
-  color: var(--n-text-muted);
+  padding-block: 22px;
+  border: 1px solid var(--n-border-strong);
+  border-radius: var(--n-radius-sm);
   background: var(--n-surface);
   box-shadow: var(--n-shadow-xs);
+  transform: translate(-50%, -50%);
 }
 
 .chat-resize-handle:hover,
 .chat-resize-handle:focus-visible {
-  border-color: var(--n-focus-ring);
   color: var(--n-text-primary);
+  outline: 0;
+}
+
+.chat-resize-handle:hover::before,
+.chat-resize-handle:focus-visible::before {
+  opacity: 0.34;
+}
+
+.chat-resize-handle:hover svg,
+.chat-resize-handle:focus-visible svg {
+  border-color: var(--n-focus-ring);
 }
 
 .chat-messages {
@@ -1568,6 +1686,7 @@ textarea {
 }
 
 .markdown-document [data-streamdown="code-block"] {
+  position: relative;
   gap: 0;
   margin-block: 22px;
   overflow: hidden;
@@ -1579,7 +1698,7 @@ textarea {
 
 .markdown-document [data-streamdown="code-block-header"] {
   height: 38px;
-  padding-inline: 12px;
+  padding-inline: 12px 88px;
   border-bottom: 1px solid var(--n-border);
   color: var(--n-text-muted);
   background: var(--n-surface-raised);
@@ -1587,17 +1706,22 @@ textarea {
 }
 
 .markdown-document [data-streamdown="code-block-actions"] {
-  border-color: var(--n-border);
-  background: color-mix(in srgb, var(--n-surface-raised) 94%, transparent);
+  gap: 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
   backdrop-filter: none;
 }
 
 .markdown-document [data-streamdown="code-block"] > div:has([data-streamdown="code-block-actions"]) {
-  position: sticky;
-  top: 8px;
+  position: absolute;
+  top: 0;
+  right: 0;
   z-index: 10;
   display: flex;
-  height: 0;
+  height: 38px;
+  align-items: center;
   justify-content: flex-end;
   margin: 0;
   padding-inline: 8px;
@@ -1606,6 +1730,25 @@ textarea {
 
 .markdown-document [data-streamdown="code-block-actions"] {
   pointer-events: auto;
+}
+
+.markdown-document [data-streamdown="code-block-actions"] button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--n-text-muted);
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-document [data-streamdown="code-block-actions"] button:hover,
+.markdown-document [data-streamdown="code-block-actions"] button:focus-visible {
+  border-color: var(--n-border);
+  color: var(--n-text-primary);
+  background: var(--n-surface-hover);
 }
 
 .markdown-document [data-streamdown="code-block-body"] {
