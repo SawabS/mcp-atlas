@@ -156,9 +156,9 @@ button { color: inherit; }
 .orbit-one { width: 105px; height: 105px; animation: orbit-spin 13s linear infinite; }
 .orbit-two { width: 205px; height: 205px; border-color: rgba(110,168,254,.13); animation: orbit-spin 20s linear infinite reverse; }
 .orbit-three { width: 310px; height: 310px; border-style: dashed; animation: orbit-spin 35s linear infinite; }
-.orbit span { position: absolute; top: -4px; left: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 12px var(--aqua); }
-.orbit-two span { left: 18%; background: var(--mint); box-shadow: 0 0 12px var(--mint); }
-.orbit-three span { top: 71%; left: 97%; background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+.orbit span { position: absolute; top: 0; left: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 12px var(--aqua); transform: translate(-50%,-50%); }
+.orbit-two span { background: var(--mint); box-shadow: 0 0 12px var(--mint); }
+.orbit-three span { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
 @keyframes orbit-spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
 .protocol-core { position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 78px; height: 78px; border: 1px solid rgba(110,168,254,.3); border-radius: 50%; color: var(--mint); background: radial-gradient(circle, rgba(110,168,254,.16), rgba(7,16,14,.9) 69%); transform: translate(-50%,-50%); box-shadow: 0 0 35px rgba(110,168,254,.08); }
 .protocol-core small { margin-top: -13px; font: 8px var(--font-geist-mono); letter-spacing: .2em; }

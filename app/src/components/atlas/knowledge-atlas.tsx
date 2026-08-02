@@ -45,6 +45,8 @@ export function KnowledgeAtlas() {
     const nextTheme = storedTheme === "light" || storedTheme === "dark"
       ? storedTheme
       : window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
     document.documentElement.style.colorScheme = nextTheme;
     const frame = window.requestAnimationFrame(() => setTheme(nextTheme));
     return () => window.cancelAnimationFrame(frame);
@@ -59,6 +61,8 @@ export function KnowledgeAtlas() {
       if (event.key === "Escape") {
         setSearchOpen(false);
         setSelectedDocument(null);
+        setChatOpen(false);
+        setMobileSidebarOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -99,6 +103,8 @@ export function KnowledgeAtlas() {
     setTheme((current) => {
       const next = current === "dark" ? "light" : "dark";
       window.localStorage.setItem("mcp-atlas-theme-v1", next);
+      document.documentElement.dataset.theme = next;
+      document.documentElement.classList.toggle("dark", next === "dark");
       document.documentElement.style.colorScheme = next;
       return next;
     });
@@ -107,7 +113,7 @@ export function KnowledgeAtlas() {
   const shellStyle = { "--chat-width": `${chatWidth}px` } as CSSProperties;
 
   return (
-    <div className={`atlas-shell theme-${theme} ${chatOpen ? "chat-visible" : ""} chat-dock-${chatDock}`} style={shellStyle}>
+    <div className={`atlas-shell theme-${theme} ${chatOpen ? "chat-visible" : ""} ${sidebarCollapsed ? "sidebar-collapsed" : ""} chat-dock-${chatDock}`} style={shellStyle}>
       <Sidebar activeView={view} stats={stats} collapsed={sidebarCollapsed} mobileOpen={mobileSidebarOpen} theme={theme} onCollapse={() => setSidebarCollapsed((value) => !value)} onNavigate={navigate} onSearch={() => setSearchOpen(true)} onChat={() => setChatOpen(true)} onToggleTheme={toggleTheme} />
       <button className={`mobile-nav-backdrop ${mobileSidebarOpen ? "is-visible" : ""}`} type="button" aria-label="Close navigation" onClick={() => setMobileSidebarOpen(false)} />
       <main className="atlas-main" aria-hidden={mobileSidebarOpen} inert={mobileSidebarOpen}>
@@ -120,7 +126,7 @@ export function KnowledgeAtlas() {
           {view === "servers" && <ServerCatalog />}
           <footer className="site-credit">Designed and developed by <a href="https://github.com/SawabS" target="_blank" rel="noreferrer"><Code2 size={15} /> @SawabS</a></footer>
         </div>
-        {!chatOpen && <button className="floating-chat" type="button" onClick={() => setChatOpen(true)}><span><MessageCircleMore size={20} /></span><div><b>Ask Atlas</b><small>Answers with exact sources</small></div><Sparkles size={16} /></button>}
+        {!chatOpen && <button className="floating-chat" type="button" aria-label="Ask Atlas" onClick={() => setChatOpen(true)}><span><MessageCircleMore size={20} /></span><div><b>Ask Atlas</b><small>Answers with exact sources</small></div><Sparkles size={16} /></button>}
       </main>
       <ChatPanel open={chatOpen} initialQuestion={initialQuestion} dock={chatDock} width={chatWidth} onClose={() => setChatOpen(false)} onDockChange={setChatDock} onResize={setChatWidth} onQuestionConsumed={() => setInitialQuestion("")} />
       <CommandPalette open={searchOpen} documents={documents} onClose={() => setSearchOpen(false)} onOpenDocument={openDocument} onSearchAll={searchAll} />

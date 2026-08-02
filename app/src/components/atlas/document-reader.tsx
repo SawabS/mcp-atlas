@@ -43,9 +43,13 @@ export function DocumentReader({ documentId, onClose, onAsk }: DocumentReaderPro
                 <button type="button" onClick={() => onAsk(`Explain the key ideas in ${document.title} and cite this source.`)}><Bot size={15} /> Ask about this</button>
               </div>
             </div>
-            <div className="markdown-document"><MessageResponse>{document.content}</MessageResponse></div>
+            <div className="markdown-document">
+              <MessageResponse mode="static" lineNumbers>
+                {document.content}
+              </MessageResponse>
+            </div>
           </main>
-          <aside className="reader-metadata">
+          <aside className="reader-metadata" aria-label="Source details">
             <span className="eyebrow">Provenance</span>
             <div className="metadata-item"><GitCommitHorizontal size={16} /><span><small>Commit</small><code>{document.commit?.slice(0, 12) ?? "registry"}</code></span></div>
             <div className="metadata-item"><FileCode2 size={16} /><span><small>Source type</small><b>{document.documentType}</b></span></div>

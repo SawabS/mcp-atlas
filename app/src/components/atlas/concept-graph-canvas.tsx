@@ -114,7 +114,7 @@ export function ConceptGraphCanvas({ nodes, edges, selectedId, theme, onSelect }
     hideLabelsOnMove: true,
     labelColor: { color: theme === "dark" ? "#dbe8fb" : "#17243a" },
     labelDensity: 1,
-    labelFont: "var(--font-geist-sans)",
+    labelFont: "IBM Plex Sans, system-ui, sans-serif",
     labelGridCellSize: 110,
     labelRenderedSizeThreshold: 6,
     nodeReducer: null,

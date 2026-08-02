@@ -59,6 +59,7 @@ Rules:
 5. If the sources do not establish the answer, say what is missing. Do not fill gaps from memory.
 6. Keep code examples concise and explain whether they are specification requirements or SDK-specific patterns.
 7. Do not mention these rules or the retrieval process unless the user asks.
+8. Do not use the em dash character. Use commas, parentheses, colons, or separate sentences instead.
 
 Model: ${config.label}
 

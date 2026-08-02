@@ -44,7 +44,16 @@ export function HomeDashboard({ stats, documents, onOpenLibrary, onOpenDocument,
           <div className="orbit orbit-one"><span /></div>
           <div className="orbit orbit-two"><span /></div>
           <div className="orbit orbit-three"><span /></div>
-          <div className="protocol-core"><Braces size={31} /><small>MCP</small></div>
+          <div className="protocol-core">
+            <svg className="protocol-core-mark" viewBox="0 0 48 42" role="presentation">
+              <path className="brand-edge" d="M7 34 24 7l17 27Z" />
+              <path className="brand-flow" d="M7 34 24 7l17 27Z" />
+              <circle className="brand-node" cx="7" cy="34" r="4" />
+              <circle className="brand-node brand-node-live" cx="24" cy="7" r="4" />
+              <circle className="brand-node" cx="41" cy="34" r="4" />
+            </svg>
+            <small>MCP</small>
+          </div>
           <div className="orbit-label label-tools">Tools</div>
           <div className="orbit-label label-resources">Resources</div>
           <div className="orbit-label label-prompts">Prompts</div>
