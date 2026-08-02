@@ -13,3 +13,5 @@ manifests/source-files.jsonl
 *.part
 __pycache__/
 *.pyc
+.vercel
+.env*
