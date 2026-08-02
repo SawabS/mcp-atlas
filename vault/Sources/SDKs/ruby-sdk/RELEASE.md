@@ -1,0 +1,33 @@
+---
+id: "modelcontextprotocol-ruby-sdk-release-md-31d18c9a7b"
+title: "Release"
+document_type: "sdk-documentation"
+content_class: "source"
+authority: "official-sdk"
+repository: "modelcontextprotocol/ruby-sdk"
+source_path: "RELEASE.md"
+source_url: "https://github.com/modelcontextprotocol/ruby-sdk/blob/72a929bbc00c512fbaad82f1e14d02fae2539032/RELEASE.md"
+commit: "72a929bbc00c512fbaad82f1e14d02fae2539032"
+retrieved_at: "2026-08-02T09:18:38+03:00"
+license: "NOASSERTION"
+generated: true
+tags:
+  - "mcp"
+  - "mcp/authority/official-sdk"
+  - "mcp/category/sdks"
+  - "mcp/sdk/ruby"
+concepts:
+---
+
+## Releases
+
+This gem is published to [RubyGems.org](https://rubygems.org/gems/mcp)
+
+Releases are triggered by PRs to the `main` branch updating the version number in `lib/mcp/version.rb`.
+
+1. **Update the version number** in `lib/mcp/version.rb`, following [semver](https://semver.org/)
+2. **Update CHANGELOG.md**, backfilling the changes since the last release if necessary, and adding a new section for the new version, clearing out the Unreleased section
+3. **Create a PR and get approval from a maintainer**
+4. **Merge your PR to the main branch** - This will automatically trigger the release workflow via GitHub Actions
+
+When changes are merged to the `main` branch, the GitHub Actions workflow (`.github/workflows/release.yml`) is triggered and the gem is published to RubyGems.

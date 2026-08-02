@@ -1,0 +1,6 @@
+filters:
+  and:
+    - file.hasTag("mcp/sdk")
+views:
+  - type: table
+    name: SDK documentation

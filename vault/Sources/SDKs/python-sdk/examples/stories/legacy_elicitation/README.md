@@ -1,0 +1,109 @@
+---
+id: "modelcontextprotocol-python-sdk-examples-stories-legacy-elicitation-readme-md-2a339c3bd7"
+title: "legacy-elicitation"
+document_type: "sdk-documentation"
+content_class: "source"
+authority: "official-sdk"
+repository: "modelcontextprotocol/python-sdk"
+source_path: "examples/stories/legacy_elicitation/README.md"
+source_url: "https://github.com/modelcontextprotocol/python-sdk/blob/a4f4ccd091138771535e17191123f20b30fda68e/examples/stories/legacy_elicitation/README.md"
+commit: "a4f4ccd091138771535e17191123f20b30fda68e"
+retrieved_at: "2026-08-02T09:18:38+03:00"
+license: "MIT"
+generated: true
+tags:
+  - "mcp"
+  - "mcp/authority/official-sdk"
+  - "mcp/category/sdks"
+  - "mcp/sdk/python"
+concepts:
+  - "[[Elicitation]]"
+  - "[[Architecture]]"
+  - "[[Authorization]]"
+  - "[[Capabilities]]"
+  - "[[SDKs]]"
+  - "[[Transports]]"
+---
+
+# legacy-elicitation
+
+> **Legacy mechanism (2025 handshake era).** This story shows the push-style
+> server→client `elicitation/create` request; the 2026-07-28 protocol carries
+> elicitation as an `InputRequiredResult` round-trip instead — that path is the
+> [`mrtr/`](../mrtr/) story. Elicitation itself is **not** deprecated.
+> TODO(maxisbey): unify once the MRTR runtime lands
+> ([#2898](https://github.com/modelcontextprotocol/python-sdk/issues/2898)).
+> The TypeScript SDK ships a single dual-era `elicitation/` story; this
+> directory re-merges back into `elicitation/` once MRTR lands.
+
+A tool pauses mid-call to ask the user for structured input. On the
+handshake-era protocol the server pushes an `elicitation/create` *request* to
+the client and blocks until the client's `elicitation_callback` answers
+`accept` / `decline` / `cancel`. Two modes: **form** (`ctx.elicit(message,
+PydanticModel)` — schema derived from the model, accepted content validated
+back into it) and **url** (`ctx.elicit_url(...)` — directs the user out-of-band
+for OAuth / payment flows; `send_elicit_complete` notifies the client when the
+flow finishes).
+
+## Run it
+
+```bash
+# stdio (default — the client spawns the server as a subprocess)
+uv run python -m stories.legacy_elicitation.client
+
+# HTTP — the client self-hosts the server on a free port, runs, then tears it
+# down (--legacy: the push request needs the handshake era)
+uv run python -m stories.legacy_elicitation.client --http --legacy
+# same, against the lowlevel-API server variant
+uv run python -m stories.legacy_elicitation.client --http --legacy --server server_lowlevel
+```
+
+## What to look at
+
+- `client.py` `main` — the whole client setup is one visible construction:
+  `Client(target, mode=mode, elicitation_callback=on_elicit)`. Supplying
+  `elicitation_callback` is what advertises the `elicitation: {form, url}`
+  capability; `on_elicit` serves *both* modes by branching on
+  `isinstance(params, ElicitRequestURLParams)`.
+- `server.py` `register_user` — `await ctx.elicit("...", Registration)` derives
+  the form schema from the pydantic model and returns a typed
+  `ElicitationResult[Registration]`; narrow with `isinstance(answer,
+  AcceptedElicitation)` before reading `answer.data`.
+- `server.py` `link_account` — `ctx.elicit_url(...)` for out-of-band flows;
+  after the user finishes, `send_elicit_complete` emits
+  `notifications/elicitation/complete` so the client can correlate.
+- `server_lowlevel.py` — the same flow via `ctx.session.elicit_form` /
+  `ctx.session.elicit_url` and a hand-written `requestedSchema`.
+
+## Caveats
+
+- **Context paths.** `ctx.elicit` / `ctx.elicit_url` and the 2-hop
+  `ctx.request_context.session.send_elicit_complete` are interim; a later
+  release will shorten these.
+- **No per-mode opt-in.** Supplying any `elicitation_callback` advertises both
+  form and url support; there is currently no way to advertise form-only from
+  `Client`.
+- **Throw-style URL elicitation** (`raise UrlElicitationRequiredError([...])` →
+  wire `-32042`) is the stateless-transport alternative to `ctx.elicit_url`;
+  see `tests/interaction/lowlevel/test_elicitation.py` and the `error_handling`
+  story.
+
+## Spec
+
+[Elicitation — client features](https://modelcontextprotocol.io/specification/2025-11-25/client/elicitation)
+
+## See also
+
+`sampling/` (same push-request shape, deprecated per SEP-2577), `mrtr/`
+(the 2026-era carrier), `error_handling/`
+(`UrlElicitationRequiredError`), `refund_desk/` (resolver DI rides this push
+mechanism on handshake-era connections).
+
+## Related concepts
+
+- [[Elicitation]]
+- [[Architecture]]
+- [[Authorization]]
+- [[Capabilities]]
+- [[SDKs]]
+- [[Transports]]

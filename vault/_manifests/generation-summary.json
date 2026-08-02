@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-08-02T07:18:31+00:00",
+  "documents": 1114,
+  "retrievalChunks": 29239,
+  "registryServers": 19638,
+  "repositories": 42,
+  "categories": {
+    "Core documentation": 262,
+    "Extensions": 105,
+    "Reference servers": 48,
+    "Registry": 38,
+    "SDKs": 358,
+    "Specification": 137,
+    "Tooling and community": 166
+  },
+  "authorities": {
+    "official-core": 399,
+    "official-sdk": 358,
+    "official-server": 32,
+    "official-tooling": 325
+  }
+}

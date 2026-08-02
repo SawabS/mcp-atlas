@@ -1,0 +1,15 @@
+# Large/generated source mirrors. The future web app should publish compact,
+# derived indexes from app/public/data rather than nested Git repositories.
+official-repos/
+registry/pages/
+registry/*.jsonl
+website/llms*.txt
+manifests/source-files.jsonl
+.env
+.env.*
+!.env.example
+
+# Transient atomic-download files and Python bytecode.
+*.part
+__pycache__/
+*.pyc

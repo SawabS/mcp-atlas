@@ -1,0 +1,6 @@
+filters:
+  and:
+    - file.hasTag("mcp/server")
+views:
+  - type: table
+    name: Active MCP servers

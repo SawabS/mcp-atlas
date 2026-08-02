@@ -1,0 +1,93 @@
+---
+id: "modelcontextprotocol-python-sdk-examples-stories-sampling-readme-md-88923f8421"
+title: "sampling"
+document_type: "sdk-documentation"
+content_class: "source"
+authority: "official-sdk"
+repository: "modelcontextprotocol/python-sdk"
+source_path: "examples/stories/sampling/README.md"
+source_url: "https://github.com/modelcontextprotocol/python-sdk/blob/a4f4ccd091138771535e17191123f20b30fda68e/examples/stories/sampling/README.md"
+commit: "a4f4ccd091138771535e17191123f20b30fda68e"
+retrieved_at: "2026-08-02T09:18:38+03:00"
+license: "MIT"
+generated: true
+tags:
+  - "mcp"
+  - "mcp/authority/official-sdk"
+  - "mcp/category/sdks"
+  - "mcp/sdk/python"
+concepts:
+  - "[[Architecture]]"
+  - "[[Sampling]]"
+  - "[[Capabilities]]"
+  - "[[Elicitation]]"
+---
+
+# sampling
+
+> **Deprecated** in the 2026-07-28 protocol (SEP-2577); functional through the
+> deprecation window. Migration: call your LLM provider directly from the
+> server instead of requesting completions through the client.
+
+A tool that asks the **client's** LLM for a completion mid-call — the inverted
+MCP direction. The server holds no model API key; it awaits
+`ctx.session.create_message(...)` and the client's `sampling_callback` answers.
+Registering the callback is what makes the client advertise the `sampling`
+capability — there is no separate flag.
+
+## Run it
+
+```bash
+# stdio (default — the client spawns the server as a subprocess)
+uv run python -m stories.sampling.client
+
+# HTTP — the client self-hosts the server on a free port, runs, then tears it down
+uv run python -m stories.sampling.client --http --legacy
+# same, against the lowlevel-API server variant
+uv run python -m stories.sampling.client --http --legacy --server server_lowlevel
+```
+
+## What to look at
+
+- `client.py` `main` — `async with Client(target, mode=mode,
+  sampling_callback=on_sample) as client:`. The callback is an ordinary
+  constructor kwarg; registering it is the whole opt-in.
+- `client.py` `on_sample` — takes `(ClientRequestContext,
+  CreateMessageRequestParams)` and returns a `CreateMessageResult`. A real
+  host calls its LLM provider here; the example returns a canned answer so the
+  round-trip is assertable.
+- `server.py` — `await ctx.session.create_message(...)` inside the tool body: a
+  server→client request that blocks until the callback answers. There is no
+  `Context.sample()` sugar; reaching `ctx.session` is the public path.
+- `server_lowlevel.py` — the same call from `ServerRequestContext.session`,
+  with the `CallToolResult` built by hand.
+
+## Caveats
+
+- **Legacy-era only.** `sampling/createMessage` is a server-initiated request
+  with no 2026-07-28 wire carrier, so this story runs with `era = "legacy"` and
+  the harness pins the handshake path.
+- `ctx.session.create_message()` is `@deprecated`; the
+  `# pyright: ignore[reportDeprecated]` is deliberate. The non-deprecated
+  replacement is to call your LLM provider directly from the server (see the
+  banner above) — there is no successor server→client call.
+- `ctx.session.*` is the interim 2-hop path; a later release will shorten it.
+- `Client` has no `sampling_capabilities=` kwarg, so the `sampling.tools`
+  sub-capability (tools-in-sampling) is unreachable from the high-level client.
+  Drop to `ClientSession` if you need it.
+
+## Spec
+
+[Sampling — client features](https://modelcontextprotocol.io/specification/2025-11-25/client/sampling)
+
+## See also
+
+`legacy_elicitation/`, `roots/` — sibling stories that exercise the same legacy
+server→client request shape.
+
+## Related concepts
+
+- [[Architecture]]
+- [[Sampling]]
+- [[Capabilities]]
+- [[Elicitation]]
