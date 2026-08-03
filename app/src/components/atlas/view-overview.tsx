@@ -84,7 +84,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
             <em>made navigable.</em>
           </h1>
           <p className="lede">
-            Specification, SDKs, reference servers and the live Registry — cross-linked into a single
+            Specification, SDKs, reference servers and the live Registry, cross-linked into a single
             atlas where every claim stays pinned to the commit it came from.
           </p>
           <div className="hero-actions">
@@ -138,7 +138,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
                 <h3>{way.label}</h3>
                 <p>{way.copy}</p>
                 <span className="way-meta">
-                  <b>{way.count ? way.count.toLocaleString("en-US") : "—"}</b>
+                  <b>{way.count ? way.count.toLocaleString("en-US") : "···"}</b>
                   {way.unit}
                   <ArrowRight size={15} />
                 </span>
@@ -222,7 +222,7 @@ function Stat({ label, value }: { label: string; value?: number }) {
   return (
     <div>
       <dt>{label}</dt>
-      <dd>{value ? shown.toLocaleString("en-US") : "—"}</dd>
+      <dd>{value ? shown.toLocaleString("en-US") : "···"}</dd>
     </div>
   );
 }
@@ -254,39 +254,51 @@ function Orbit() {
     <div className="orbit">
       <div className="orbit-halo" />
 
-      <div className="orbit-ring" style={ring("4%", "46s", "var(--iris)")}>
-        <span className="orbit-node" style={node("18deg", "var(--iris)")} />
-        <span className="orbit-node" style={node("152deg", "var(--aqua)")} />
-      </div>
-      <div className="orbit-ring" style={ring("19%", "34s", "var(--aqua)")}>
-        <span className="orbit-node" style={node("74deg", "var(--aqua)")} />
-        <span className="orbit-node" style={node("248deg", "var(--rose)")} />
-      </div>
-      <div className="orbit-ring" style={ring("33%", "25s", "var(--rose)")}>
-        <span className="orbit-node" style={node("206deg", "var(--rose)")} />
-      </div>
+      <Ring inset="4%" speed="46s" hue="var(--iris)" bodies={[["18deg", "var(--iris)"], ["152deg", "var(--aqua)"]]} />
+      <Ring inset="19%" speed="34s" hue="var(--aqua)" bodies={[["74deg", "var(--aqua)"], ["248deg", "var(--rose)"]]} />
+      <Ring inset="33%" speed="25s" hue="var(--rose)" bodies={[["206deg", "var(--rose)"]]} />
 
       <div className="orbit-core">
         <Mark />
       </div>
 
-      <span className="orbit-caption" style={{ top: "6%", left: "2%", animationDelay: "0s" }}>
-        <i className="spark" /> Tools
+      <span className="orbit-caption drift-a" style={{ top: "6%", left: "2%" }}>
+        Tools
       </span>
-      <span className="orbit-caption" style={{ top: "44%", right: "-4%", animationDelay: "1.4s" }}>
+      <span className="orbit-caption drift-b" style={{ top: "44%", right: "-4%" }}>
         Resources
       </span>
-      <span className="orbit-caption" style={{ bottom: "8%", left: "12%", animationDelay: "2.6s" }}>
+      <span className="orbit-caption drift-c" style={{ bottom: "8%", left: "12%" }}>
         Prompts
       </span>
     </div>
   );
 }
 
-function ring(inset: string, speed: string, hue: string) {
-  return { "--inset": inset, "--speed": speed, "--hue": hue } as React.CSSProperties;
-}
-
-function node(angle: string, hue: string) {
-  return { "--a": angle, "--hue": hue } as React.CSSProperties;
+/**
+ * One orbit: a fixed path plus a separate layer carrying the bodies. They share
+ * a period, so they stay in step while the bodies pass in front of the core.
+ */
+function Ring({
+  inset,
+  speed,
+  hue,
+  bodies,
+}: {
+  inset: string;
+  speed: string;
+  hue: string;
+  bodies: Array<[string, string]>;
+}) {
+  const track = { "--inset": inset, "--speed": speed, "--hue": hue } as React.CSSProperties;
+  return (
+    <>
+      <div className="orbit-ring" style={track} />
+      <div className="orbit-orbiters" style={track} aria-hidden="true">
+        {bodies.map(([angle, bodyHue]) => (
+          <span key={angle} className="orbit-node" style={{ "--a": angle, "--hue": bodyHue } as React.CSSProperties} />
+        ))}
+      </div>
+    </>
+  );
 }

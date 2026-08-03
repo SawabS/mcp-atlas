@@ -24,6 +24,25 @@ function corsHeaders(request: Request): HeadersInit {
   };
 }
 
+/**
+ * Turns a provider failure into a sentence that says what to do about it. With
+ * several models behind one endpoint the difference matters: a missing
+ * entitlement, a rejected key and a busy upstream all need different action.
+ */
+function describeModelFailure(error: unknown, label: string): string {
+  const status = (error as { statusCode?: number })?.statusCode;
+  if (status === 401 || status === 403) {
+    return `The API key configured for ${label} was rejected. Check that it is current and has access to this model.`;
+  }
+  if (status === 404) {
+    return `${label} is not enabled for the account behind its API key, so the provider returned no such model. Pick another model or enable it on the account.`;
+  }
+  if (status === 429 || status === 529) {
+    return `${label} is busy upstream right now. Try again in a moment, or pick another model.`;
+  }
+  return `Atlas could not complete this answer with ${label}. Check the model configuration and try again.`;
+}
+
 function latestQuestion(messages: UIMessage[]): string {
   const userMessage = [...messages].reverse().find((message) => message.role === "user");
   return userMessage?.parts
@@ -85,11 +104,21 @@ ${context || "No relevant source passage was found."}`;
           messages: await convertToModelMessages(messages),
           maxOutputTokens: 1800,
         });
-        writer.merge(result.toUIMessageStream({ sendStart: false }));
+        // This stream carries its own error handler, which would otherwise
+        // replace the message below with a bare "An error occurred."
+        writer.merge(
+          result.toUIMessageStream({
+            sendStart: false,
+            onError: (error) => {
+              console.error("Model stream failed", error);
+              return describeModelFailure(error, config.label);
+            },
+          }),
+        );
       },
       onError: (error) => {
         console.error("Chat stream failed", error);
-        return "Atlas could not complete this answer. Check the model configuration and try again.";
+        return describeModelFailure(error, config.label);
       },
     });
     return createUIMessageStreamResponse({ stream, headers: corsHeaders(request) });

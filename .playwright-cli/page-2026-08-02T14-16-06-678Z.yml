@@ -1,0 +1,103 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary "Atlas navigation" [ref=e3]:
+      - button "Go to Atlas home" [ref=e4] [cursor=pointer]:
+        - generic [ref=e12]:
+          - generic [ref=e13]: MCP Atlas
+          - generic [ref=e14]: Living protocol knowledge
+      - button "Search everything ⌘ K" [ref=e15] [cursor=pointer]:
+        - generic [ref=e19]: Search everything
+        - generic [ref=e20]: ⌘ K
+      - navigation "Primary navigation" [ref=e21]:
+        - button "Overview" [ref=e22] [cursor=pointer]
+        - button "Knowledge" [ref=e27] [cursor=pointer]
+        - button "Concept graph" [ref=e31] [cursor=pointer]
+        - button "Server registry" [ref=e37] [cursor=pointer]
+      - generic [ref=e42]:
+        - text: Knowledge pulse
+        - strong [ref=e47]: ... grounded passages
+        - paragraph [ref=e48]: Every answer traces back to an exact official source.
+      - generic [ref=e49]:
+        - generic [ref=e52]:
+          - strong [ref=e53]: Corpus online
+          - generic [ref=e54]: 42 repositories
+        - button "Switch to light theme" [ref=e55] [cursor=pointer]
+        - button "Toggle sidebar" [ref=e62] [cursor=pointer]
+    - main [ref=e66]:
+      - generic [ref=e67]:
+        - generic [ref=e68]: Synced today
+        - generic [ref=e70]:
+          - button "Light" [ref=e71] [cursor=pointer]
+          - button "Search" [ref=e78] [cursor=pointer]
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - generic [ref=e86]: Official MCP knowledge, mapped
+              - heading "Understand the protocol. Follow every connection." [level=1] [ref=e88]
+              - paragraph [ref=e89]: Explore the specification, SDKs, servers, and Registry through a source-linked knowledge atlas built for people and AI.
+              - generic [ref=e90]:
+                - button "Browse knowledge" [ref=e91] [cursor=pointer]
+                - button "Read the specification" [ref=e95] [cursor=pointer]
+              - generic [ref=e99]:
+                - generic [ref=e103]: Answers grounded in exact commits
+                - generic [ref=e105]: ... searchable passages
+            - generic [ref=e106]:
+              - generic [ref=e113]: MCP
+              - generic [ref=e121]: Tools
+              - generic [ref=e122]: Resources
+              - generic [ref=e123]: Prompts
+              - generic [ref=e124]: Sampling
+          - generic [ref=e125]:
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - text: Explore the corpus
+                - heading "Four ways into MCP" [level=2] [ref=e128]
+              - button "View all documents" [ref=e129] [cursor=pointer]
+            - generic [ref=e132]:
+              - button "Specification Navigate ... source-linked documents. ... documents" [ref=e133] [cursor=pointer]:
+                - strong [ref=e138]: Specification
+                - paragraph [ref=e139]: Navigate ... source-linked documents.
+                - generic [ref=e140]:
+                  - generic [ref=e141]: ...
+                  - text: documents
+              - button "SDKs Navigate ... source-linked documents. ... documents" [ref=e144] [cursor=pointer]:
+                - strong [ref=e149]: SDKs
+                - paragraph [ref=e150]: Navigate ... source-linked documents.
+                - generic [ref=e151]:
+                  - generic [ref=e152]: ...
+                  - text: documents
+              - button "Reference servers Navigate ... source-linked documents. ... documents" [ref=e155] [cursor=pointer]:
+                - strong [ref=e163]: Reference servers
+                - paragraph [ref=e164]: Navigate ... source-linked documents.
+                - generic [ref=e165]:
+                  - generic [ref=e166]: ...
+                  - text: documents
+              - button "Registry Discover active community and official MCP servers. ... active servers" [ref=e169] [cursor=pointer]:
+                - strong [ref=e175]: Registry
+                - paragraph [ref=e176]: Discover active community and official MCP servers.
+                - generic [ref=e177]:
+                  - generic [ref=e178]: ...
+                  - text: active servers
+          - generic [ref=e181]:
+            - generic [ref=e184]:
+              - text: Current specification
+              - heading "Start with the source" [level=2] [ref=e185]
+            - generic [ref=e186]:
+              - generic [ref=e191]:
+                - text: Provenance first
+                - heading "Trace every claim" [level=2] [ref=e192]
+              - paragraph [ref=e193]: Every knowledge note keeps its repository, source path, license, and exact commit attached.
+              - generic [ref=e194]:
+                - button "Read current specification sources" [ref=e195] [cursor=pointer]
+                - button "Compare official SDK documentation" [ref=e199] [cursor=pointer]
+                - button "Inspect reference implementations" [ref=e203] [cursor=pointer]
+        - generic [ref=e207]:
+          - text: Designed and developed by
+          - link "@SawabS" [ref=e208] [cursor=pointer]:
+            - /url: https://github.com/SawabS
+      - button "Ask Atlas" [ref=e211] [cursor=pointer]:
+        - generic [ref=e215]:
+          - generic [ref=e216]: Ask Atlas
+          - generic [ref=e217]: Answers with exact sources
+  - button "Open Next.js Dev Tools" [ref=e223] [cursor=pointer]

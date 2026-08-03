@@ -28,7 +28,7 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MCP Atlas — the Model Context Protocol, mapped",
+    default: "MCP Atlas: the Model Context Protocol, mapped",
     template: "%s | MCP Atlas",
   },
   description:

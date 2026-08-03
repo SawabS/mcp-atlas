@@ -25,9 +25,9 @@ export function displayMarkdown(value: string) {
 function displayDocumentSummary<T extends KnowledgeDocumentSummary>(document: T): T {
   return {
     ...document,
-    title: displayText(document.title),
-    excerpt: displayText(document.excerpt),
-    headings: document.headings.map(displayText).filter(Boolean),
+    title: withoutEmDash(displayText(document.title)),
+    excerpt: withoutEmDash(displayText(document.excerpt)),
+    headings: document.headings.map((heading) => withoutEmDash(displayText(heading))).filter(Boolean),
   };
 }
 
@@ -47,17 +47,32 @@ export function displayGraph(graph: GraphData): GraphData {
     ...graph,
     nodes: graph.nodes.map((node) => ({
       ...node,
-      label: displayText(node.label),
-      summary: displayText(node.summary),
+      label: withoutEmDash(displayText(node.label)),
+      summary: withoutEmDash(displayText(node.summary)),
     })),
   };
+}
+
+/*
+ * House style has no em dash, so titles, excerpts, headings, graph copy and
+ * registry text are normalised on the way to the screen.
+ *
+ * The one exception is the reader's document body in displayDocument. That is
+ * the quotation itself, shown next to a "View exact commit" link, so it stays
+ * byte for byte as published.
+ */
+function withoutEmDash(value: string) {
+  return value
+    .replace(/\s*[—―]\s*/g, ", ")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s*,/g, ",");
 }
 
 export function displayRegistry(servers: RegistryServer[]): RegistryServer[] {
   return servers.map((server) => ({
     ...server,
-    title: displayText(server.title),
-    description: displayText(server.description),
+    title: withoutEmDash(displayText(server.title)),
+    description: withoutEmDash(displayText(server.description)),
   }));
 }
 

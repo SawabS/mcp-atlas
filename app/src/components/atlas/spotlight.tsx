@@ -117,7 +117,7 @@ export function Spotlight({ open, documents, onClose, onOpen, onSearchAll }: Spo
             </button>
           ))}
 
-          {!results.length && <div className="spotlight-label">No direct matches — try the full search</div>}
+          {!results.length && <div className="spotlight-label">No direct matches. Try the full search.</div>}
 
           {query.trim() && (
             <button

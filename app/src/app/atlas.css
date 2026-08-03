@@ -1,5 +1,5 @@
 /* ============================================================
-   MCP Atlas — Aurora design system
+   MCP Atlas, the Aurora design system
    ------------------------------------------------------------
    00  Sky (backdrop)
    01  Layout + reveal
@@ -512,7 +512,11 @@ kbd {
   align-items: center;
   gap: 18px;
   height: var(--rail-h);
-  padding: 0 var(--gutter);
+  /*
+   * The rail is full bleed but its contents line up with the centred measure,
+   * so on a wide display the brand does not drift away from the page column.
+   */
+  padding: 0 max(var(--gutter), calc((100vw - var(--measure)) / 2 + var(--gutter)));
   border-bottom: 1px solid transparent;
   transition:
     background 420ms var(--ease-out),
@@ -554,11 +558,34 @@ kbd {
   width: 26px;
   height: 26px;
   transition: transform 620ms var(--ease-spring);
+  /* The node flare grows past the viewBox; let it bloom instead of clipping. */
+  overflow: visible;
 }
 
-.mark-ring {
+/* Only the light travels. The link ring underneath stays put. */
+.mark-pulse {
   transform-origin: 16px 16px;
-  animation: spin 26s linear infinite;
+  animation: spin var(--cycle, 5.4s) linear infinite;
+}
+
+.mark-node-flare {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: mark-flare var(--cycle, 5.4s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.mark-node-core {
+  opacity: 0.7;
+  animation: mark-lit var(--cycle, 5.4s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.mark:not(.is-live) .mark-pulse,
+.mark:not(.is-live) .mark-node-flare,
+.mark:not(.is-live) .mark-node-core {
+  animation: none;
 }
 
 .segmented {
@@ -746,6 +773,7 @@ kbd {
 .orbit-ring {
   position: absolute;
   inset: var(--inset);
+  z-index: 1;
   border-radius: 50%;
   border: 1px solid var(--line);
   animation: spin var(--speed) linear infinite;
@@ -759,6 +787,21 @@ kbd {
   background: conic-gradient(from 0deg, transparent 52%, var(--hue) 93%, transparent);
   mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
   opacity: 0.75;
+}
+
+/*
+ * The orbiting bodies ride a second layer that spins with the same period as
+ * its ring. Keeping them out of the ring means they can sit above the core
+ * instead of disappearing behind it, since the ring's own animation makes it a
+ * stacking context that a child z-index cannot escape.
+ */
+.orbit-orbiters {
+  position: absolute;
+  inset: var(--inset);
+  z-index: 3;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: spin var(--speed) linear infinite;
 }
 
 .orbit-node {
@@ -782,13 +825,17 @@ kbd {
 
 .orbit-core {
   position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 33%;
   aspect-ratio: 1;
   border-radius: 50%;
   border: 1px solid var(--line-2);
-  background: radial-gradient(circle at 42% 34%, var(--glass-2), transparent 70%), var(--glass);
+  /* A lens, not a solid disc, so the rings stay readable through it. */
+  background:
+    radial-gradient(circle at 40% 32%, color-mix(in oklab, var(--glass-2) 62%, transparent), transparent 64%),
+    color-mix(in oklab, var(--glass) 55%, transparent);
   backdrop-filter: blur(10px);
   box-shadow: 0 0 90px -20px color-mix(in oklab, var(--iris) 70%, transparent);
 }
@@ -801,6 +848,7 @@ kbd {
 .orbit-halo {
   position: absolute;
   inset: 14%;
+  z-index: 0;
   border-radius: 50%;
   background: conic-gradient(from 200deg, var(--iris), var(--aqua), var(--rose), var(--iris));
   filter: blur(46px);
@@ -810,6 +858,7 @@ kbd {
 
 .orbit-caption {
   position: absolute;
+  z-index: 4;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -821,7 +870,20 @@ kbd {
   font-size: 11.5px;
   color: var(--text-2);
   white-space: nowrap;
-  animation: float 7s var(--ease-glide) infinite alternate;
+  will-change: transform;
+  animation: caption-drift-a 17s var(--ease-glide) infinite alternate;
+}
+
+.orbit-caption.drift-b {
+  animation-name: caption-drift-b;
+  animation-duration: 21s;
+  animation-delay: -7s;
+}
+
+.orbit-caption.drift-c {
+  animation-name: caption-drift-c;
+  animation-duration: 19s;
+  animation-delay: -13s;
 }
 
 /* Ways in */
@@ -1159,6 +1221,11 @@ kbd {
 }
 
 .badge[data-kind="tooling"] {
+  --hue: var(--gold);
+  --tint: var(--gold-soft);
+}
+
+.badge[data-kind="registry"] {
   --hue: var(--gold);
   --tint: var(--gold-soft);
 }
@@ -1501,6 +1568,52 @@ kbd {
 .server-card {
   gap: 13px;
   min-height: 196px;
+  cursor: pointer;
+}
+
+/*
+ * Stretched hit area: the card opens the record, while the outbound link and
+ * anything else interactive sits on the layer above it.
+ */
+.server-open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+}
+
+.server-open:focus-visible {
+  outline-offset: -4px;
+}
+
+.server-card > *:not(.server-open) {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.server-card .server-link {
+  pointer-events: auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.meta-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-3);
 }
 
 .server-head {
@@ -2113,13 +2226,83 @@ kbd {
   letter-spacing: -0.016em;
 }
 
-.ask-head small {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: var(--text-3);
+/* Model picker: provider glyph plus model name, in the panel header. */
+.model-select {
+  height: 30px;
+  gap: 8px;
+  padding: 0 6px 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--glass);
+  font-size: 12px;
+  color: var(--text-2);
+  max-width: 190px;
+}
+
+.model-select:hover {
+  background: var(--glass-2);
+  color: var(--text);
+}
+
+.model-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/*
+ * Every provider logo sits on the same dark tile. Two of the marks are white on
+ * transparent and would vanish against the light theme otherwise.
+ */
+.provider-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 5px;
+  background: #12131a;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  overflow: hidden;
+}
+
+.provider-mark img {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+}
+
+.model-menu {
+  /* Above the Ask panel (85), which is the only place this menu opens from. */
+  z-index: 95;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in oklab, var(--paper-2) 94%, transparent);
+  backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: var(--shadow-float);
+}
+
+.model-menu [data-slot="select-item"] {
+  gap: 10px;
+  padding: 8px 34px 8px 9px;
+  border-radius: 10px;
+}
+
+.model-option {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.model-option b {
+  font-size: 13px;
+  font-weight: 520;
+  color: var(--text);
+}
+
+.model-option small {
+  font-size: 11px;
+  color: var(--text-3);
 }
 
 .ask-head select.chip {
@@ -2381,6 +2564,15 @@ kbd {
   line-height: 1.55;
 }
 
+/*
+ * The composer shell already draws a focus ring around the whole control, so
+ * the textarea's own global focus outline would stack a second rounded box
+ * inside it and read as a stray divider. Focus stays visible on the shell.
+ */
+.ask-foot textarea:focus-visible {
+  outline: none;
+}
+
 .ask-foot [data-slot="input-group-addon"] {
   padding: 4px 8px 8px;
   border-top: 0;
@@ -2405,49 +2597,43 @@ kbd {
   opacity: 0.4;
 }
 
-/* Native selects inside chips */
-select.chip {
-  appearance: none;
-  padding-right: 26px;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
-    linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position:
-    calc(100% - 14px) 14px,
-    calc(100% - 10px) 14px;
-  background-size:
-    4px 4px,
-    4px 4px;
-  background-repeat: no-repeat;
-  max-width: 150px;
-  text-overflow: ellipsis;
-}
-
 .ask-drag {
   position: absolute;
   top: 0;
-  left: -4px;
-  width: 9px;
+  left: -5px;
+  width: 11px;
   height: 100%;
+  border: 0;
   cursor: col-resize;
   background: none;
+  touch-action: none;
 }
 
+/* One hairline column marks the whole edge as draggable. No handle, no notch. */
 .ask-drag::after {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 3px;
-  width: 3px;
-  height: 42px;
-  margin-top: -21px;
-  border-radius: 99px;
-  background: var(--line-2);
+  inset-block: 0;
+  left: 5px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in oklab, var(--iris) 60%, transparent) 18%,
+    color-mix(in oklab, var(--iris) 60%, transparent) 82%,
+    transparent
+  );
   opacity: 0;
-  transition: opacity 260ms;
+  transition: opacity 240ms var(--ease-out);
 }
 
-.ask-drag:hover::after {
+.ask-drag:hover::after,
+.ask-drag:focus-visible::after {
   opacity: 1;
+}
+
+.ask-drag:focus-visible {
+  outline: none;
 }
 
 /* Floating call to action */
@@ -2576,9 +2762,20 @@ select.chip {
 .foot a {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   color: var(--text-2);
   transition: color 240ms;
+}
+
+/* The glyph sits on the text baseline rather than the line box centre. */
+.foot-github {
+  position: relative;
+  top: -0.5px;
+  opacity: 0.85;
+}
+
+.foot a:hover .foot-github {
+  opacity: 1;
 }
 
 .foot a:hover {
@@ -2638,6 +2835,74 @@ select.chip {
   }
   to {
     transform: translateY(5px);
+  }
+}
+
+/* Node lit by the arriving pulse: a quick bloom that fades out. */
+@keyframes mark-flare {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  5% {
+    opacity: 0.5;
+    transform: scale(2);
+  }
+  20% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes mark-lit {
+  0%,
+  9% {
+    opacity: 1;
+  }
+  28%,
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* Captions drift on their own path so the group never moves in lockstep. */
+@keyframes caption-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(6px, -13px, 0);
+  }
+  100% {
+    transform: translate3d(-4px, -3px, 0);
+  }
+}
+
+@keyframes caption-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-9px, 10px, 0);
+  }
+  100% {
+    transform: translate3d(3px, -6px, 0);
+  }
+}
+
+@keyframes caption-drift-c {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(11px, 7px, 0);
+  }
+  100% {
+    transform: translate3d(-5px, -9px, 0);
   }
 }
 
@@ -2750,6 +3015,31 @@ select.chip {
 }
 
 /* ---------- Responsive ----------------------------------- */
+
+/* Wide displays: let the column breathe rather than stranding it mid-screen. */
+@media (min-width: 1700px) {
+  :root {
+    --measure: 1440px;
+  }
+
+  .constellation {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    height: clamp(560px, 62vh, 780px);
+  }
+}
+
+@media (min-width: 2200px) {
+  :root {
+    --measure: 1600px;
+  }
+}
+
+/* Keep the graph panel's action clear of the floating Ask launcher. */
+@media (min-width: 1181px) {
+  .node-panel {
+    padding-bottom: 84px;
+  }
+}
 
 @media (max-width: 1180px) {
   .hero {

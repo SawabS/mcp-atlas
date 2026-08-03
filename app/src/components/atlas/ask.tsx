@@ -19,14 +19,25 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mark } from "@/components/atlas/mark";
+import { ProviderMark, providerName, type Provider } from "@/components/atlas/provider-mark";
 import { chatEndpoint } from "@/lib/client-data";
 import { displayMarkdown, displayText } from "@/lib/display-text";
 
 const seeds = [
   "How does the stateless protocol handshake work?",
-  "Tools versus resources — when do I use each?",
+  "Tools versus resources: when do I use each?",
   "How should I secure a remote MCP server?",
+];
+
+type ModelKey = "nemotron" | "kimi" | "deepseek" | "glm";
+
+const models: Array<{ key: ModelKey; label: string; provider: Provider }> = [
+  { key: "nemotron", label: "Nemotron 3 Ultra", provider: "nvidia" },
+  { key: "kimi", label: "Kimi K2.6", provider: "moonshot" },
+  { key: "deepseek", label: "DeepSeek V4 Flash", provider: "deepseek" },
+  { key: "glm", label: "GLM 5.2", provider: "zai" },
 ];
 
 const linkSafety = { enabled: false } as const;
@@ -54,19 +65,22 @@ function linkCitations(text: string, sources: Array<{ sourceId: string; url: str
 type AskProps = {
   open: boolean;
   seed: { id: number; text: string } | null;
+  readyModels: string[];
   onClose: () => void;
   onSeedUsed: () => void;
 };
 
-export function Ask({ open, seed, onClose, onSeedUsed }: AskProps) {
-  const kimiEnabled = process.env.NEXT_PUBLIC_ENABLE_KIMI === "true";
-  const [model, setModel] = useState<"nemotron" | "kimi">("nemotron");
+export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) {
+  /* Resolved on the server from the configured keys. Empty means unknown. */
+  const ready = useMemo(() => new Set(readyModels), [readyModels]);
+  const [model, setModel] = useState<ModelKey>("nemotron");
   const [input, setInput] = useState("");
   const [width, setWidth] = useState(0);
   const [copied, setCopied] = useState<string | null>(null);
   const usedSeed = useRef<number | null>(null);
   const panelRef = useRef<HTMLElement>(null);
 
+  const active = models.find((option) => option.key === model) ?? models[0];
   const transport = useMemo(() => new DefaultChatTransport({ api: chatEndpoint(), body: { model } }), [model]);
   const { messages, sendMessage, status, stop, error, setMessages } = useChat({ transport });
   const busy = status === "submitted" || status === "streaming";
@@ -136,21 +150,32 @@ export function Ask({ open, seed, onClose, onSeedUsed }: AskProps) {
           <Mark />
           <div style={{ flex: 1, minWidth: 0 }}>
             <strong>Ask Atlas</strong>
-            <small>
-              <i className="spark" /> Answers cite exact sources
-            </small>
           </div>
-          <select
-            className="chip"
-            value={model}
-            onChange={(event) => setModel(event.target.value as "nemotron" | "kimi")}
-            aria-label="Answer model"
-          >
-            <option value="nemotron">Nemotron 3 Ultra</option>
-            <option value="kimi" disabled={!kimiEnabled}>
-              Kimi K2.6{kimiEnabled ? "" : " (unavailable)"}
-            </option>
-          </select>
+          <Select value={model} onValueChange={(value) => setModel(value as ModelKey)}>
+            <SelectTrigger className="model-select" size="sm" aria-label="Answer model">
+              <SelectValue>
+                <ProviderMark provider={active.provider} />
+                <span className="model-name">{active.label}</span>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent className="model-menu">
+              {models.map((option) => {
+                const unavailable = ready.size > 0 && !ready.has(option.key);
+                return (
+                  <SelectItem key={option.key} value={option.key} disabled={unavailable}>
+                    <ProviderMark provider={option.provider} size={24} />
+                    <span className="model-option">
+                      <b>{option.label}</b>
+                      <small>
+                        {providerName[option.provider]}
+                        {unavailable ? " (no key configured)" : ""}
+                      </small>
+                    </span>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
           {messages.length > 0 && (
             <button className="icon-btn" type="button" onClick={() => setMessages([])} aria-label="Clear conversation">
               <RotateCcw size={16} />

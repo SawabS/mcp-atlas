@@ -30,6 +30,11 @@ export function Constellation({ graph, documents, theme, onExplore, onOpen }: Co
 
   const model = useMemo(() => buildGraph(graph, documents, mode === "notes"), [documents, graph, mode]);
 
+  /*
+   * Nothing is selected on arrival, so the panel opens on the first node. The
+   * canvas is handed the same node, otherwise the panel would describe a
+   * concept that the graph shows as unlit.
+   */
   const selected = useMemo(() => {
     const nodeIndex = model.index.get(selectedId);
     return nodeIndex === undefined ? model.nodes[0] : model.nodes[nodeIndex];
@@ -149,7 +154,12 @@ export function Constellation({ graph, documents, theme, onExplore, onOpen }: Co
         <div className="constellation">
           <div className="canvas-wrap">
             {graph ? (
-              <ConstellationCanvas graph={model} selectedId={selectedId} theme={theme} onSelect={setSelectedId} />
+              <ConstellationCanvas
+                graph={model}
+                selectedId={selected?.id ?? ""}
+                theme={theme}
+                onSelect={setSelectedId}
+              />
             ) : (
               <div className="loading">
                 <Waypoints size={22} className="spin" />

@@ -3,17 +3,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Box, Cloud, GitFork, LoaderCircle, Package, Search, Signal } from "lucide-react";
 import { Reveal, useLit } from "@/components/atlas/motion";
+import { ServerSheet } from "@/components/atlas/server-sheet";
 import { loadRegistry } from "@/lib/client-data";
 import type { RegistryServer } from "@/lib/knowledge-types";
 
 const PAGE = 48;
 
-export function Registry() {
+export function Registry({ onAsk }: { onAsk: (question: string) => void }) {
   const [servers, setServers] = useState<RegistryServer[] | null>(null);
   const [query, setQuery] = useState("");
   const [transport, setTransport] = useState("all");
   const [limit, setLimit] = useState(PAGE);
   const [filterKey, setFilterKey] = useState("|all");
+  const [open, setOpen] = useState<RegistryServer | null>(null);
   const lit = useLit();
 
   if (filterKey !== `${query}|${transport}`) {
@@ -57,11 +59,11 @@ export function Registry() {
               The living catalogue of <em>servers</em>
             </h1>
             <p className="lede">
-              Metadata only — packages and endpoints are listed, never fetched or executed.
+              Metadata only. Packages and endpoints are listed, never fetched or executed.
             </p>
           </div>
           <div className="counter">
-            <b>{servers ? results.length.toLocaleString("en-US") : "—"}</b>
+            <b>{servers ? results.length.toLocaleString("en-US") : "···"}</b>
             <span>active servers</span>
           </div>
         </header>
@@ -111,7 +113,7 @@ export function Registry() {
             <div className="card-grid">
               {results.slice(0, limit).map((server, index) => (
                 <Reveal key={`${server.id}-${index}`} delay={Math.min(index, 11) * 30}>
-                  <ServerCard server={server} onPointerMove={lit} />
+                  <ServerCard server={server} onPointerMove={lit} onOpen={() => setOpen(server)} />
                 </Reveal>
               ))}
             </div>
@@ -129,6 +131,8 @@ export function Registry() {
           </div>
         )}
       </section>
+
+      {open && <ServerSheet server={open} onClose={() => setOpen(null)} onAsk={onAsk} />}
     </div>
   );
 }
@@ -136,9 +140,11 @@ export function Registry() {
 function ServerCard({
   server,
   onPointerMove,
+  onOpen,
 }: {
   server: RegistryServer;
   onPointerMove: React.PointerEventHandler<HTMLElement>;
+  onOpen: () => void;
 }) {
   const href = server.repositoryUrl || server.websiteUrl || server.remotes[0]?.url || undefined;
   const kinds = [
@@ -149,6 +155,14 @@ function ServerCard({
 
   return (
     <article className="card server-card lit" onPointerMove={onPointerMove}>
+      {/*
+       * The whole card opens the record. The outbound link stays above it so
+       * both destinations remain reachable by pointer and by keyboard.
+       */}
+      <button className="server-open" type="button" onClick={onOpen}>
+        <span className="sr-only">Open the {server.title} registry record</span>
+      </button>
+
       <div className="server-head">
         <span className="server-avatar">{server.title.slice(0, 2).toUpperCase()}</span>
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -157,11 +171,11 @@ function ServerCard({
         </div>
         {href && (
           <a
-            className="icon-btn"
+            className="icon-btn server-link"
             href={href}
             target="_blank"
             rel="noreferrer"
-            aria-label={`Open ${server.title}`}
+            aria-label={`Open ${server.title} on ${server.repositoryUrl ? "GitHub" : "the web"}`}
           >
             {server.repositoryUrl ? <GitFork size={15} /> : <ArrowUpRight size={15} />}
           </a>
