@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import GlareHover from "@/components/GlareHover";
 import StarBorder from "@/components/StarBorder";
+import DecryptedText from "@/components/DecryptedText";
 import { Mark } from "@/components/atlas/mark";
 import { Reveal } from "@/components/atlas/motion";
 import type { CorpusStats, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
@@ -152,7 +153,16 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
                   <span className="way-glyph">
                     <Icon size={19} />
                   </span>
-                  <h3>{way.label}</h3>
+                  <h3>
+                    <DecryptedText
+                      text={way.label}
+                      animateOn="hover"
+                      speed={24}
+                      maxIterations={5}
+                      useOriginalCharsOnly
+                      encryptedClassName="way-title-encrypted"
+                    />
+                  </h3>
                   <p>{way.copy}</p>
                   <span className="way-meta">
                     <b>{way.count ? way.count.toLocaleString("en-US") : "···"}</b>

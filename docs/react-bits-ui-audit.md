@@ -50,7 +50,7 @@ Best Atlas opportunities: AnimatedList for a short search result set, ChromaGrid
 
 Ferrofluid, Lightfall, LiquidEther, Prism, DarkVeil, LightPillar, Silk, FloatingLines, SideRays, LightRays, PixelBlast, ColorBends, EvilEye, LineWaves, Radar, SoftAurora, Aurora, Plasma, PlasmaWave, Particles, GradientBlinds, Grainient, GridScan, Beams, PixelSnow, Lightning, PrismaticBurst, Galaxy, Dither, FaultyTerminal, RippleGrid, DotField, DotGrid, Threads, Hyperspeed, Iridescence, Waves, GridDistortion, Ballpit, Orb, LetterGlitch, GridMotion, ShapeGrid, LiquidChrome, Balatro.
 
-Best Atlas opportunities: at most one lazy-loaded hero background, with a static fallback and automatic suspension for reduced motion, narrow screens, hidden tabs, and low-power devices. SoftAurora, Aurora, Threads, or DotGrid align with the product language. Stacking a WebGL background behind the existing sky, orbit, custom cursor, and constellation canvas would be visual noise and an unnecessary GPU cost.
+Best Atlas opportunities: at most one lazy-loaded atmospheric background, with a static fallback and automatic suspension for reduced motion and hidden tabs. SoftAurora, Aurora, Threads, or DotGrid align with the product language. The adopted SoftAurora is blended into the existing sky at very low opacity instead of competing with the orbit or constellation.
 
 ## Adoption matrix for MCP Atlas
 
@@ -58,15 +58,16 @@ Best Atlas opportunities: at most one lazy-loaded hero background, with a static
 | --- | --- | --- | --- |
 | Adopted | GlareHover | Four overview entry cards | CSS-only and hover-triggered; no pointer geometry reads |
 | Adopted | StarBorder | Primary “Explore the library” CTA | One instance; disabled for reduced motion |
+| Adopted | DecryptedText | Four overview card titles | Hover-only; Motion dependency removed from the imported source |
+| Adopted | SoftAurora | Fixed atmospheric sky | Lazy-loaded, 30 FPS cap, 1.25 DPR cap, pauses when hidden or reduced-motion |
 | Existing equivalent | CountUp | Corpus totals | Current local implementation only runs while values settle and is lighter than adding Motion |
-| Existing equivalent | Target/Ghost cursor | Atlas cursor aura | Keep one cursor system; no competing global listeners |
+| Existing equivalent | Target/Ghost cursor | Shooting-star ball, tail, and glitter | Keep one passive global listener and one cursor system |
 | Existing equivalent | OrbitImages/MagicRings | Protocol orbit | Keep the semantic Tools/Resources/Prompts orbit |
 | Next, low risk | LogoLoop | SDK languages and supported transports | Pause off-screen and on hover; use text/SVG assets only |
-| Next, low risk | DecryptedText | Pinned commit reveal | Trigger on hover or focus, never continuously |
 | Next, scoped | AnimatedList | Spotlight’s top results | Cap the animated list and lazy-load its motion dependency |
 | Next, scoped | Folder | Group SDK guides/examples by language | Use as progressive enhancement, with semantic links beneath |
 | Conditional | ChromaGrid or MagicBento | A curated “popular paths” section | Never use for all 1,114 documents |
-| Conditional | SoftAurora/Threads/DotGrid | One alternate hero skin | Lazy-load, suspend off-screen, provide a no-canvas fallback |
+| Conditional | Threads/DotGrid | Alternate atmospheric skin | Replace SoftAurora rather than stacking another canvas |
 | Reject for repeated cards | SpotlightCard, Magnet, BorderGlow | Pointer-following card effects | Per-instance geometry reads/listeners recreate the lag just removed |
 | Reject globally | ClickSpark, PixelCard, canvas trails | Decorative interaction | Continuous RAF/canvas work is disproportionate to navigation value |
 | Reject here | GlassSurface, FluidGlass | Dense library and registry grids | Repeated backdrop filters are expensive to repaint |
@@ -80,7 +81,9 @@ Best Atlas opportunities: at most one lazy-loaded hero background, with a static
 - Limited hover motion to composited `transform`, with shorter timing and no animated shadow.
 - Added `content-visibility: auto` and intrinsic sizing to long card grids so off-screen cards can skip rendering work.
 - Added reduced-motion behavior for Atlas and imported React Bits effects.
-- Kept React Bits effects concentrated on five high-value elements rather than multiplying them across 36–48 cards.
+- Kept React Bits effects concentrated on the page atmosphere and four overview cards rather than multiplying them across 36–48 result cards.
+- Adapted SoftAurora to cap rendering at 30 FPS and 1.25 DPR, pause in hidden tabs, and render a static frame for reduced-motion users.
+- Adapted DecryptedText to use native React spans, avoiding an otherwise unnecessary Motion runtime.
 
 ## MCP prompts for future passes
 

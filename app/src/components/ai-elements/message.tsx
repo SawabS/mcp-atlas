@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { AtlasMarkdownCode } from "@/components/ai-elements/code-block";
 import { cjk } from "@streamdown/cjk";
 import { createCodePlugin } from "@streamdown/code";
 import { math } from "@streamdown/math";
@@ -328,19 +329,17 @@ const codeHighlighter = createCodePlugin({
 const streamdownPlugins = { cjk, code: codeHighlighter, math, mermaid };
 
 export const MessageResponse = memo(
-  ({ className, ...props }: MessageResponseProps) => (
+  ({ className, components, ...props }: MessageResponseProps) => (
     <Streamdown
       className={cn(
         "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className
       )}
+      components={{ ...components, code: AtlasMarkdownCode }}
       plugins={streamdownPlugins}
       {...props}
     />
-  ),
-  (prevProps, nextProps) =>
-    prevProps.children === nextProps.children &&
-    nextProps.isAnimating === prevProps.isAnimating
+  )
 );
 
 MessageResponse.displayName = "MessageResponse";
