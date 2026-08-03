@@ -2,7 +2,7 @@
 
 This directory contains the browser interface and grounded chat backend for the MCP Atlas knowledge base.
 
-The interface includes a source-linked home dashboard, searchable library, document reader, active Registry catalogue, and an Obsidian-style interactive graph. The graph uses Sigma.js, Graphology, and a ForceAtlas2 worker to support both a focused concept network and the full source-note network. Dark and light themes, responsive navigation, and a resizable left or right chat panel are included.
+The interface includes a source-linked home dashboard, searchable library, document reader, active Registry catalogue, and an Obsidian-style interactive graph. A purpose-built canvas renderer draws the deterministic constellation and keeps its camera, adjacency index, and label collision pass outside React. Dark and light themes, responsive navigation, and a resizable grounded chat panel are included.
 
 ## Commands
 
@@ -21,4 +21,4 @@ The standard build includes the `/api/chat` route. The Pages build emits static 
 
 Generated browser data is in `public/data/`. Server-only retrieval chunks are in `data/retrieval-chunks.jsonl`. Source generation and validation scripts remain at the project root in `../scripts/`.
 
-See the root [README](../README.md) and [architecture guide](../docs/ARCHITECTURE.md) for setup, provenance, and deployment details.
+See the root [README](../README.md), [architecture guide](../docs/ARCHITECTURE.md), and [AI engineering guide](../docs/AI-ENGINEERING.md) for setup, provenance, retrieval, model access, citations, and deployment details.

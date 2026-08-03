@@ -104,7 +104,7 @@ For the complete application, including the private model key and `/api/chat`, d
 
 GitHub Pages can host the static explorer. The included workflow builds `app/out`. Because GitHub Pages cannot keep API secrets, its chat panel must call a separately hosted backend through `NEXT_PUBLIC_CHAT_API_URL`. Set `CHAT_API_URL` as a GitHub repository variable and restrict the backend with `ALLOWED_ORIGIN`.
 
-Detailed data flow, security boundaries, and publishing options are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Detailed data flow, security boundaries, and publishing options are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). The model boundary, streaming event contract, citation validation, and operational AI engineering are documented in [docs/AI-ENGINEERING.md](docs/AI-ENGINEERING.md).
 
 ## Source policy
 

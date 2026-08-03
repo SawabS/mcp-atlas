@@ -111,7 +111,7 @@ sequenceDiagram
     Browser-->>User: Render linked citations and source cards
 ```
 
-The default model is `nvidia/nemotron-3-ultra-550b-a55b` through NVIDIA's OpenAI-compatible endpoint. Kimi support remains available in the server configuration, but the browser option is hidden unless `NEXT_PUBLIC_ENABLE_KIMI=true` because account provisioning can differ.
+The default model is `nvidia/nemotron-3-ultra-550b-a55b` through NVIDIA's OpenAI-compatible endpoint. Kimi K2.6, DeepSeek V4 Flash, and GLM 5.2 use the same endpoint and appear when their server-side keys are configured. Model choice changes generation only; every model receives the same server-retrieved evidence contract. See [AI-ENGINEERING.md](AI-ENGINEERING.md) for the model boundary, stream events, citation validation, and failure behavior.
 
 ## Security boundaries
 

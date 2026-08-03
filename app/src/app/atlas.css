@@ -124,12 +124,23 @@
     0 0 18px color-mix(in oklab, var(--iris) 48%, transparent);
 }
 
-[data-motion-cursor="pointer"].atlas-motion-cursor {
+[data-motion-cursor].atlas-motion-cursor[data-atlas-cursor="pointer"] {
   background: color-mix(in oklab, var(--iris) 34%, transparent);
   border-color: color-mix(in oklab, var(--aqua) 72%, white);
   box-shadow:
     0 0 12px color-mix(in oklab, var(--aqua) 54%, transparent),
     inset 0 0 12px color-mix(in oklab, var(--iris) 34%, transparent);
+}
+
+/* Motion's text mode becomes one luminous caret, not a tiny bordered pill. */
+[data-motion-cursor].atlas-motion-cursor[data-atlas-cursor="text"] {
+  width: 1px !important;
+  border: 0;
+  border-radius: 0 !important;
+  background: linear-gradient(180deg, transparent, var(--aqua) 18% 82%, transparent);
+  box-shadow:
+    0 0 4px color-mix(in oklab, var(--aqua) 88%, transparent),
+    0 0 10px color-mix(in oklab, var(--iris) 56%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -143,6 +154,11 @@
   .orbit-halo,
   .orbit-caption,
   .ask-fab {
+    animation: none !important;
+  }
+
+  .chat-progress-orbit i,
+  .chat-progress-step[data-state="active"] > span {
     animation: none !important;
   }
 
@@ -2722,6 +2738,127 @@ kbd {
   text-decoration-color: color-mix(in oklab, var(--iris) 40%, transparent);
 }
 
+.answer a.citation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline: 0.12em;
+  padding: 0.08em 0.4em 0.1em;
+  border: 1px solid color-mix(in oklab, var(--iris) 28%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--iris) 7%, var(--glass));
+  color: var(--text-2);
+  font-size: 0.72em;
+  font-weight: 520;
+  line-height: 1.45;
+  text-decoration: none;
+  vertical-align: 0.08em;
+  white-space: nowrap;
+  transition: border-color 180ms, background 180ms, color 180ms, transform 220ms var(--ease-spring);
+}
+
+.answer a.citation-chip:hover,
+.answer a.citation-chip:focus-visible {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--aqua) 54%, var(--line));
+  background: color-mix(in oklab, var(--aqua) 9%, var(--glass));
+  color: var(--text);
+}
+
+.citation-chip b {
+  color: var(--iris);
+  font-family: var(--font-mono-stack);
+  font-size: 0.92em;
+}
+
+.citation-preview {
+  z-index: 100;
+  width: min(330px, calc(100vw - 24px));
+  padding: 13px;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--paper-2) 96%, transparent);
+  backdrop-filter: blur(22px) saturate(1.25);
+  box-shadow: var(--shadow-float);
+}
+
+.citation-preview-site {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.citation-preview-site > span {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--glass-2);
+  color: var(--text-2);
+}
+
+.citation-preview-site div {
+  flex: 1;
+  min-width: 0;
+}
+
+.citation-preview-site strong,
+.citation-preview-site small {
+  display: block;
+}
+
+.citation-preview-site strong {
+  font-size: 11.5px;
+  font-weight: 540;
+  color: var(--text);
+}
+
+.citation-preview-site small {
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.citation-preview-site > b {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--iris-soft);
+  color: var(--iris);
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+}
+
+.citation-preview-title {
+  display: block;
+  margin-top: 11px;
+  font-size: 12.5px;
+  font-weight: 550;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.citation-preview p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 6px;
+  color: var(--text-2);
+  font-size: 11.5px;
+  line-height: 1.48;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.citation-preview-open {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  color: var(--iris);
+  font-size: 10.5px;
+  font-weight: 520;
+}
+
 .answer table {
   width: 100%;
   border-collapse: collapse;
@@ -2736,28 +2873,206 @@ kbd {
   text-align: left;
 }
 
-.thinking {
+.chat-progress {
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--iris) 24%, var(--line));
+  border-radius: 15px;
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--iris) 7%, transparent), transparent 52%),
+    var(--glass);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
+}
+
+.chat-progress-head {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 58px;
+  padding: 9px 10px 9px 12px;
+}
+
+.chat-progress-orbit {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in oklab, var(--iris) 28%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--iris-soft), transparent 68%);
+}
+
+.chat-progress-orbit i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+}
+
+.chat-progress-orbit i:first-child {
+  inset: 12px;
+  background: color-mix(in oklab, white 34%, var(--iris));
+  box-shadow: 0 0 10px var(--iris);
+  animation: progress-core 1.8s var(--ease-glide) infinite alternate;
+}
+
+.chat-progress-orbit i:not(:first-child) {
+  top: 15px;
+  left: 15px;
+  width: 4px;
+  height: 4px;
+  background: var(--aqua);
+  box-shadow: 0 0 7px var(--aqua);
+  animation: progress-orbit 2.6s linear infinite;
+}
+
+.chat-progress-orbit i:nth-child(3) { animation-delay: -0.86s; }
+.chat-progress-orbit i:nth-child(4) { animation-delay: -1.72s; }
+
+.chat-progress-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.chat-progress-toggle > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-progress-toggle strong,
+.chat-progress-toggle small {
+  display: block;
+}
+
+.chat-progress-toggle strong {
+  overflow: hidden;
   font-size: 12.5px;
+  font-weight: 520;
+  color: var(--text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-progress-toggle small {
+  margin-top: 2px;
+  font-size: 10.5px;
   color: var(--text-3);
 }
 
-.thinking i {
-  width: 5px;
-  height: 5px;
+.chat-progress-toggle svg {
+  flex: none;
+  color: var(--text-3);
+  transition: transform 260ms var(--ease-out);
+}
+
+.chat-progress[data-expanded="true"] .chat-progress-toggle svg {
+  transform: rotate(180deg);
+}
+
+.chat-progress-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--paper-2) 46%, transparent);
+  font-size: 10.5px;
+  color: var(--text-3);
+  transition: color 180ms, border-color 180ms, background 180ms;
+}
+
+.chat-progress-stop:hover {
+  border-color: color-mix(in oklab, var(--rose) 38%, var(--line));
+  background: color-mix(in oklab, var(--rose) 7%, transparent);
+  color: var(--text);
+}
+
+.chat-progress-steps {
+  padding: 4px 12px 13px 28px;
+  border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+}
+
+.chat-progress-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 10px;
+  padding-top: 10px;
+  color: var(--text-3);
+}
+
+.chat-progress-step > span {
+  position: relative;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  margin-top: 4px;
+  border: 1px solid var(--line-2);
   border-radius: 50%;
+  background: var(--paper-2);
+}
+
+.chat-progress-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 21px;
+  bottom: -9px;
+  left: 3px;
+  width: 1px;
+  background: var(--line);
+}
+
+.chat-progress-step strong,
+.chat-progress-step small {
+  display: block;
+}
+
+.chat-progress-step strong {
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.chat-progress-step small {
+  margin-top: 1px;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.chat-progress-step[data-state="complete"] > span {
+  border-color: color-mix(in oklab, var(--aqua) 70%, transparent);
+  background: var(--aqua);
+  box-shadow: 0 0 7px color-mix(in oklab, var(--aqua) 50%, transparent);
+}
+
+.chat-progress-step[data-state="complete"] strong,
+.chat-progress-step[data-state="active"] strong {
+  color: var(--text-2);
+}
+
+.chat-progress-step[data-state="active"] > span {
+  border-color: var(--iris);
   background: var(--iris);
-  animation: bob 1.3s var(--ease-glide) infinite;
+  box-shadow: 0 0 0 4px var(--iris-soft), 0 0 9px var(--iris);
+  animation: progress-step 1.5s var(--ease-glide) infinite alternate;
 }
 
-.thinking i:nth-child(2) {
-  animation-delay: 0.16s;
+@keyframes progress-core {
+  to { transform: scale(1.35); opacity: 0.7; }
 }
 
-.thinking i:nth-child(3) {
-  animation-delay: 0.32s;
+@keyframes progress-orbit {
+  to { transform: rotate(1turn) translateX(12px) rotate(-1turn); }
+}
+
+@keyframes progress-step {
+  to { box-shadow: 0 0 0 2px var(--iris-soft), 0 0 5px var(--iris); }
 }
 
 .ask-error {
@@ -2936,15 +3251,49 @@ kbd {
   color: var(--text-2);
 }
 
+.source-summary {
+  gap: 7px;
+  padding: 4px 0;
+}
+
+.source-summary > small {
+  color: var(--text-3);
+}
+
+.source-summary > svg {
+  transition: transform 220ms var(--ease-out);
+}
+
+.source-summary[data-state="open"] > svg {
+  transform: rotate(180deg);
+}
+
+.source-stack {
+  display: flex;
+  padding-left: 4px;
+}
+
+.source-stack > span {
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  margin-left: -4px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--paper-2);
+  color: var(--text-2);
+}
+
 .source-link {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 9px;
-  padding: 8px 11px;
-  border-radius: 10px;
+  padding: 10px 11px;
+  border-radius: 12px;
   border: 1px solid var(--line);
   background: var(--glass);
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-2);
   transition:
     border-color 220ms,
@@ -2963,12 +3312,56 @@ kbd {
   color: var(--text);
 }
 
-.source-link > span:nth-child(2) {
+.source-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 27px;
+  height: 27px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--glass-2);
+  color: var(--text-2);
+}
+
+.source-copy {
   flex: 1;
   min-width: 0;
+}
+
+.source-copy strong,
+.source-copy small,
+.source-copy > span {
+  display: block;
+}
+
+.source-copy strong {
   overflow: hidden;
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 520;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.source-copy small {
+  overflow: hidden;
+  margin-top: 2px;
+  color: var(--text-3);
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-copy > span {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 5px;
+  color: var(--text-3);
+  font-size: 10.5px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .source-tag {
@@ -2987,6 +3380,7 @@ kbd {
   place-items: center;
   min-width: 26px;
   height: 19px;
+  margin-top: 4px;
   padding: 0 5px;
   border-radius: 6px;
   background: var(--iris-soft);
@@ -2995,14 +3389,9 @@ kbd {
   font-size: 10px;
 }
 
-.source-link span:nth-child(2) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.source-link svg {
+.source-link > svg {
   margin-left: auto;
+  margin-top: 6px;
   color: var(--text-3);
 }
 

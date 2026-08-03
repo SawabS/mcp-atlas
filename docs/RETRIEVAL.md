@@ -125,7 +125,8 @@ appending the whole list to every sentence.
 
 ## 6. Rendering the answer
 
-The route streams the sources first, then the answer text. In the client:
+The route streams truthful progress (`retrieving`, `ranking`, then `drafting`),
+structured source metadata, and finally the answer text. In the client:
 
 - `linkCitations()` turns each `[S1]` into a link to that exact passage,
   normalises `[S1, S2]` into separate markers, collapses repeated markers, and
@@ -134,7 +135,12 @@ The route streams the sources first, then the answer text. In the client:
 - the source list shows every retrieved passage, and marks the ones the answer
   actually cited, keeping the distinction between what was read and what was
   used;
+- inline markers show publisher identity beside `S#`; hover or keyboard focus
+  opens the exact passage title and excerpt without leaving the answer;
 - every citation resolves to a commit-pinned permalink.
+
+The full model boundary, UI message-part schema, provider routing, and failure
+behavior are documented in [AI-ENGINEERING.md](AI-ENGINEERING.md).
 
 ## Evaluating changes
 

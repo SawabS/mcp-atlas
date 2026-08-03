@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { ArrowRight, Check, Copy, ExternalLink, RotateCcw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Copy, ExternalLink, RotateCcw, Sparkles, X } from "lucide-react";
 import {
   Conversation,
   ConversationContent,
@@ -19,11 +19,18 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
+import { ChatProgress } from "@/components/atlas/chat-progress";
+import {
+  atlasMessageComponents,
+  CitationSourcesProvider,
+} from "@/components/atlas/citation-link";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mark } from "@/components/atlas/mark";
 import { ProviderMark, providerName, type Provider } from "@/components/atlas/provider-mark";
+import { getSourceIdentity, SourceGlyph } from "@/components/atlas/source-identity";
 import { chatEndpoint } from "@/lib/client-data";
 import { displayMarkdown, displayText } from "@/lib/display-text";
+import type { AtlasUIMessage } from "@/lib/knowledge-types";
 
 const seeds = [
   "How does the stateless protocol handshake work?",
@@ -112,8 +119,16 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
 
   const active = models.find((option) => option.key === model) ?? models[0];
   const transport = useMemo(() => new DefaultChatTransport({ api: chatEndpoint(), body: { model } }), [model]);
-  const { messages, sendMessage, status, stop, error, setMessages } = useChat({ transport });
+  const { messages, sendMessage, status, stop, error, setMessages } = useChat<AtlasUIMessage>({ transport });
   const busy = status === "submitted" || status === "streaming";
+  const liveMessage = messages.at(-1);
+  const liveSources = liveMessage?.parts.filter((part) => part.type === "source-url") ?? [];
+  const liveProgress = liveMessage?.parts
+    .filter((part) => part.type === "data-progress")
+    .at(-1)?.data;
+  const liveHasText = Boolean(
+    liveMessage?.parts.some((part) => part.type === "text" && part.text.trim()),
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -238,6 +253,12 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
 
             {messages.map((message, position) => {
               const sources = message.parts.filter((part) => part.type === "source-url");
+              const attributions = message.parts
+                .filter((part) => part.type === "data-source")
+                .map((part) => part.data);
+              const attributionById = new Map(
+                attributions.map((source) => [source.sourceId.toUpperCase(), source]),
+              );
               const texts = message.parts.filter((part) => part.type === "text");
               const streaming = busy && position === messages.length - 1 && message.role === "assistant";
               const plain = texts.map((part) => part.text).join("\n");
@@ -272,17 +293,33 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                     </p>
                   ) : (
                     <div className="answer">
-                      {texts.map((part, index) => (
-                        <MessageResponse key={index} linkSafety={linkSafety} isAnimating={streaming}>
-                          {displayMarkdown(linkCitations(part.text, sources))}
-                        </MessageResponse>
-                      ))}
+                      <CitationSourcesProvider sources={attributions}>
+                        {texts.map((part, index) => (
+                          <MessageResponse
+                            components={atlasMessageComponents}
+                            key={index}
+                            linkSafety={linkSafety}
+                            isAnimating={streaming}
+                          >
+                            {displayMarkdown(linkCitations(part.text, sources))}
+                          </MessageResponse>
+                        ))}
+                      </CitationSourcesProvider>
                     </div>
                   )}
 
                   {sources.length > 0 && (
                     <Sources>
-                      <SourcesTrigger className="sources-toggle" count={sources.length} />
+                      <SourcesTrigger className="sources-toggle source-summary" count={sources.length}>
+                        <span className="source-stack" aria-hidden="true">
+                          {sources.slice(0, 3).map((source) => (
+                            <span key={source.sourceId}><SourceGlyph url={source.url} size={11} /></span>
+                          ))}
+                        </span>
+                        <span>Sources</span>
+                        <small>{used.size} cited · {sources.length} reviewed</small>
+                        <ChevronDown aria-hidden="true" size={13} />
+                      </SourcesTrigger>
                       <SourcesContent className="flex w-full flex-col gap-1.5">
                         {/*
                          * All retrieved passages are listed, with the ones the
@@ -290,7 +327,11 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                          * what was read versus what was used.
                          */}
                         {sources.map((source) => {
-                          const title = displayText(source.title ?? source.sourceId);
+                          const details = attributionById.get(source.sourceId.toUpperCase());
+                          const title = displayText(details?.title ?? source.title ?? source.sourceId);
+                          const heading = displayText(details?.heading ?? "");
+                          const description = heading && heading !== title ? `${title}, ${heading}` : title;
+                          const identity = getSourceIdentity(source.url);
                           const cited = used.has(source.sourceId.toUpperCase());
                           return (
                             <Source
@@ -298,10 +339,18 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                               data-cited={cited}
                               key={source.sourceId}
                               href={source.url}
-                              title={cited ? `Cited in this answer: ${title}` : title}
+                              title={cited ? `Cited in this answer: ${description}` : description}
                             >
+                              <span className="source-icon"><SourceGlyph url={source.url} size={14} /></span>
                               <span className="source-num">{source.sourceId}</span>
-                              <span>{title}</span>
+                              <span className="source-copy">
+                                <strong>{description}</strong>
+                                <small>
+                                  {identity.label}
+                                  {details?.sourcePath ? ` · ${details.sourcePath}` : ` · ${identity.host}`}
+                                </small>
+                                {details?.excerpt && <span>{details.excerpt}</span>}
+                              </span>
                               {cited && <span className="source-tag">cited</span>}
                               <ExternalLink size={12} />
                             </Source>
@@ -326,12 +375,13 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
             })}
 
             {busy && (
-              <div className="thinking" role="status" aria-live="polite">
-                <i />
-                <i />
-                <i />
-                {status === "submitted" ? "Retrieving the closest sources" : "Writing a grounded answer"}
-              </div>
+              <ChatProgress
+                hasText={liveHasText}
+                onStop={stop}
+                progress={liveProgress}
+                sourceCount={liveSources.length}
+                status={status}
+              />
             )}
 
             {error && (
