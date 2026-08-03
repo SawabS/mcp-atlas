@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Ask } from "@/components/atlas/ask";
 import { Constellation } from "@/components/atlas/view-constellation";
+import { CursorAura } from "@/components/atlas/cursor-aura";
 import { Library } from "@/components/atlas/view-library";
 import { Overview } from "@/components/atlas/view-overview";
 import { Reader } from "@/components/atlas/reader";
@@ -126,6 +127,7 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
   return (
     <>
       <Sky />
+      <CursorAura />
       <div className="atlas">
         <Rail
           view={view}
@@ -168,8 +170,8 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
               ? `Corpus synced ${new Date(stats.generatedAt).toLocaleDateString("en", { month: "long", day: "numeric", year: "numeric" })} · ${stats.repositories} official repositories`
               : "Source-linked knowledge for the Model Context Protocol"}
           </span>
-          <span>
-            Designed and developed by{" "}
+          <span className="foot-credit">
+            <span>Designed and developed by</span>
             <a href="https://github.com/SawabS" target="_blank" rel="noreferrer">
               <GithubMark />
               @SawabS

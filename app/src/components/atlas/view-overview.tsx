@@ -254,21 +254,39 @@ function Orbit() {
     <div className="orbit">
       <div className="orbit-halo" />
 
-      <Ring inset="4%" speed="46s" hue="var(--iris)" bodies={[["18deg", "var(--iris)"], ["152deg", "var(--aqua)"]]} />
-      <Ring inset="19%" speed="34s" hue="var(--aqua)" bodies={[["74deg", "var(--aqua)"], ["248deg", "var(--rose)"]]} />
-      <Ring inset="33%" speed="25s" hue="var(--rose)" bodies={[["206deg", "var(--rose)"]]} />
+      <Ring
+        inset="4%"
+        speed="46s"
+        direction="normal"
+        hue="var(--iris)"
+        bodies={[
+          ["18deg", "var(--iris)"],
+          ["152deg", "var(--aqua)"],
+        ]}
+      />
+      <Ring
+        inset="19%"
+        speed="34s"
+        direction="reverse"
+        hue="var(--aqua)"
+        bodies={[
+          ["74deg", "var(--aqua)"],
+          ["248deg", "var(--rose)"],
+        ]}
+      />
+      <Ring inset="33%" speed="25s" direction="normal" hue="var(--rose)" bodies={[["206deg", "var(--rose)"]]} />
 
       <div className="orbit-core">
         <Mark />
       </div>
 
-      <span className="orbit-caption drift-a" style={{ top: "6%", left: "2%" }}>
+      <span className="orbit-caption drift-a" data-cursor="orbit-label" style={{ top: "6%", left: "2%" }}>
         Tools
       </span>
-      <span className="orbit-caption drift-b" style={{ top: "44%", right: "-4%" }}>
+      <span className="orbit-caption drift-b" data-cursor="orbit-label" style={{ top: "44%", right: "-4%" }}>
         Resources
       </span>
-      <span className="orbit-caption drift-c" style={{ bottom: "8%", left: "12%" }}>
+      <span className="orbit-caption drift-c" data-cursor="orbit-label" style={{ bottom: "8%", left: "12%" }}>
         Prompts
       </span>
     </div>
@@ -282,15 +300,22 @@ function Orbit() {
 function Ring({
   inset,
   speed,
+  direction,
   hue,
   bodies,
 }: {
   inset: string;
   speed: string;
+  direction: "normal" | "reverse";
   hue: string;
   bodies: Array<[string, string]>;
 }) {
-  const track = { "--inset": inset, "--speed": speed, "--hue": hue } as React.CSSProperties;
+  const track = {
+    "--inset": inset,
+    "--speed": speed,
+    "--direction": direction,
+    "--hue": hue,
+  } as React.CSSProperties;
   return (
     <>
       <div className="orbit-ring" style={track} />

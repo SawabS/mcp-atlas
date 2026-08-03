@@ -10,6 +10,7 @@ import json
 import posixpath
 import re
 import shutil
+import textwrap
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -159,6 +160,11 @@ def rewrite_browser_links(markdown: str, repository: str, commit: str | None, so
         if not target or target.startswith(("#", "http://", "https://", "mailto:", "data:")):
             return match.group(0)
         path_part, separator, anchor = target.partition("#")
+        if not image_link and path_part.startswith("/docs/"):
+            url = f"https://modelcontextprotocol.io{path_part}"
+            if separator:
+                url = f"{url}#{anchor}"
+            return f"]({url})"
         if path_part.startswith("/posts/"):
             resolved = f"blog/static{path_part}"
         elif path_part.startswith("/"):
@@ -180,8 +186,63 @@ def normalize_document(text: str, suffix: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     if suffix == ".mdx":
         text = re.sub(r"^(?:import|export)\s+.*$", "", text, flags=re.MULTILINE)
-        text = re.sub(r"^<[/]?[A-Z][^>]*>\s*$", "", text, flags=re.MULTILINE)
+        text = normalize_mdx_components(text)
     return text.strip() + "\n"
+
+
+def normalize_mdx_components(text: str) -> str:
+    """Translate documentation-site MDX components into portable Markdown."""
+    protected: list[str] = []
+
+    def protect(match: re.Match[str]) -> str:
+        token = f"\0ATLAS_SEGMENT_{len(protected)}\0"
+        protected.append(match.group(0))
+        return token
+
+    value = re.sub(r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`", protect, text)
+
+    def attribute(attributes: str, name: str) -> str:
+        match = re.search(rf"\b{re.escape(name)}\s*=\s*(?:\"([^\"]*)\"|'([^']*)')", attributes, re.IGNORECASE)
+        return (match.group(1) or match.group(2)) if match else ""
+
+    def card(match: re.Match[str]) -> str:
+        attributes, body = match.group(1), textwrap.dedent(match.group(2)).strip()
+        title = attribute(attributes, "title") or "Learn more"
+        href = attribute(attributes, "href")
+        heading = f"[{title}]({href})" if href else title
+        copy = f"\n\n{body}" if body else ""
+        return f"\n### {heading}{copy}\n"
+
+    def card_single(match: re.Match[str]) -> str:
+        attributes = match.group(1)
+        title = attribute(attributes, "title") or "Learn more"
+        href = attribute(attributes, "href")
+        return f"\n- [{title}]({href})\n" if href else f"\n- {title}\n"
+
+    def titled_block(match: re.Match[str]) -> str:
+        name, attributes, body = match.group(1), match.group(2), textwrap.dedent(match.group(3)).strip()
+        title = attribute(attributes, "title") or attribute(attributes, "value") or name
+        return f"\n#### {title}\n\n{body}\n"
+
+    def callout(match: re.Match[str]) -> str:
+        name, body = match.group(1), textwrap.dedent(match.group(2)).strip().replace("\n", "\n> ")
+        return f"\n> **{name}:** {body}\n"
+
+    value = re.sub(r"<Card\b([^>]*)>([\s\S]*?)</Card\s*>", card, value, flags=re.IGNORECASE)
+    value = re.sub(r"<Card\b([^>]*)/>", card_single, value, flags=re.IGNORECASE)
+    value = re.sub(r"<(Tab|Step|Accordion)\b([^>]*)>([\s\S]*?)</\1\s*>", titled_block, value, flags=re.IGNORECASE)
+    value = re.sub(r"<(Warning|Info|Note|Tip|Danger)\b[^>]*>([\s\S]*?)</\1\s*>", callout, value, flags=re.IGNORECASE)
+    value = re.sub(r"<(Badge|Tooltip)\b[^>]*>([\s\S]*?)</\1\s*>", r"\2", value, flags=re.IGNORECASE)
+    value = re.sub(r"<Icon\b[^>]*/?>", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"<(?:Badge|Tooltip)\b[^>]*/>", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"^\s*</?(?:CardGroup|Columns?|Tabs|Steps|AccordionGroup)\b[^>]*>\s*$", "", value, flags=re.IGNORECASE | re.MULTILINE)
+    value = re.sub(r"&nbsp;", " ", value, flags=re.IGNORECASE)
+    value = re.sub(r"[ \t]+\n", "\n", value)
+    value = re.sub(r"\n{4,}", "\n\n\n", value)
+
+    for index, segment in enumerate(protected):
+        value = value.replace(f"\0ATLAS_SEGMENT_{index}\0", segment)
+    return value
 
 
 def plain_text(markdown: str) -> str:

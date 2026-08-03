@@ -101,6 +101,128 @@
   background: linear-gradient(to top, var(--paper) 12%, transparent);
 }
 
+/* Theme-aware pointer aura. It is mounted only for fine pointers and users
+   who have not requested reduced motion; touch and keyboard input stay native. */
+.cursor-aura-ring,
+.cursor-aura-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.cursor-aura-ring {
+  width: 38px;
+  height: 38px;
+  transition: opacity 180ms;
+}
+
+.cursor-aura-ring i {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in oklab, var(--iris) 58%, var(--text-3));
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--iris) 8%, transparent), transparent 64%);
+  box-shadow:
+    0 0 22px -8px color-mix(in oklab, var(--iris) 80%, transparent),
+    inset 0 0 12px color-mix(in oklab, var(--aqua) 8%, transparent);
+  transition:
+    transform 360ms var(--ease-spring),
+    border-radius 280ms var(--ease-out),
+    border-color 220ms,
+    background 220ms,
+    box-shadow 280ms;
+}
+
+.cursor-aura-ring i::before,
+.cursor-aura-ring i::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: inherit;
+  border-top: 1px solid var(--aqua);
+  opacity: 0.65;
+  animation: cursor-spin 2.8s linear infinite;
+}
+
+.cursor-aura-ring i::after {
+  inset: 12px;
+  border-top-color: var(--rose);
+  animation-direction: reverse;
+  animation-duration: 2s;
+}
+
+.cursor-aura-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow:
+    0 0 0 2px color-mix(in oklab, var(--iris) 28%, transparent),
+    0 0 13px var(--aqua);
+  transition:
+    width 180ms var(--ease-out),
+    height 180ms var(--ease-out),
+    opacity 140ms,
+    background 180ms;
+}
+
+.cursor-aura-ring.is-visible,
+.cursor-aura-dot.is-visible {
+  opacity: 1;
+}
+
+.cursor-aura-ring[data-mode="action"] i {
+  transform: scale(1.36);
+  border-color: color-mix(in oklab, var(--iris) 84%, var(--aqua));
+  background: radial-gradient(circle, var(--iris-soft), transparent 68%);
+  box-shadow: 0 0 30px -7px color-mix(in oklab, var(--iris) 90%, transparent);
+}
+
+.cursor-aura-ring[data-mode="canvas"] i {
+  transform: scale(1.18) rotate(45deg);
+  border-radius: 11px;
+  border-color: color-mix(in oklab, var(--aqua) 78%, var(--line-2));
+  background: color-mix(in oklab, var(--aqua) 7%, transparent);
+}
+
+.cursor-aura-ring[data-mode="text"] i {
+  transform: scaleX(0.16) scaleY(0.72);
+  border-radius: 4px;
+  border-color: var(--aqua);
+  background: color-mix(in oklab, var(--aqua) 30%, transparent);
+}
+
+.cursor-aura-ring[data-mode="text"] i::before,
+.cursor-aura-ring[data-mode="text"] i::after {
+  opacity: 0;
+}
+
+.cursor-aura-dot[data-mode="action"] {
+  width: 7px;
+  height: 7px;
+  background: var(--aqua);
+}
+
+.cursor-aura-ring.is-down i {
+  transform: scale(0.78);
+}
+
+html[data-cursor="aurora"],
+html[data-cursor="aurora"] * {
+  cursor: none !important;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor-aura-ring,
+  .cursor-aura-dot {
+    display: none !important;
+  }
+}
+
 /* ---------- 01 · Layout ---------------------------------- */
 
 .atlas {
@@ -777,6 +899,7 @@ kbd {
   border-radius: 50%;
   border: 1px solid var(--line);
   animation: spin var(--speed) linear infinite;
+  animation-direction: var(--direction, normal);
 }
 
 .orbit-ring::after {
@@ -802,6 +925,7 @@ kbd {
   border-radius: 50%;
   pointer-events: none;
   animation: spin var(--speed) linear infinite;
+  animation-direction: var(--direction, normal);
 }
 
 .orbit-node {
@@ -854,6 +978,7 @@ kbd {
   filter: blur(46px);
   opacity: 0.4;
   animation: spin 22s linear infinite;
+  animation-direction: reverse;
 }
 
 .orbit-caption {
@@ -871,18 +996,42 @@ kbd {
   color: var(--text-2);
   white-space: nowrap;
   will-change: transform;
-  animation: caption-drift-a 17s var(--ease-glide) infinite alternate;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px -22px color-mix(in oklab, var(--iris) 60%, transparent);
+  animation: caption-drift-a 14s ease-in-out infinite alternate;
+  transition:
+    border-color 260ms,
+    color 260ms,
+    background 260ms,
+    box-shadow 320ms;
+}
+
+.orbit-caption::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--iris);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--iris) 75%, transparent);
+}
+
+.orbit-caption:hover {
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--iris) 42%, var(--line));
+  background: color-mix(in oklab, var(--paper) 82%, transparent);
+  box-shadow: 0 16px 38px -20px color-mix(in oklab, var(--iris) 78%, transparent);
+  animation-play-state: paused;
 }
 
 .orbit-caption.drift-b {
   animation-name: caption-drift-b;
-  animation-duration: 21s;
+  animation-duration: 17s;
   animation-delay: -7s;
 }
 
 .orbit-caption.drift-c {
   animation-name: caption-drift-c;
-  animation-duration: 19s;
+  animation-duration: 15s;
   animation-delay: -13s;
 }
 
@@ -1974,7 +2123,7 @@ kbd {
   color: var(--text-3);
 }
 
-.prose code {
+.prose :not(pre) > code {
   font-family: var(--font-mono-stack);
   font-size: 0.86em;
   padding: 0.15em 0.42em;
@@ -2026,8 +2175,7 @@ kbd {
   width: 100%;
   border-collapse: collapse;
   font-size: 13.5px;
-  display: block;
-  overflow-x: auto;
+  display: table;
 }
 
 .prose th,
@@ -2451,7 +2599,7 @@ kbd {
   margin-top: 0.3em;
 }
 
-.answer code {
+.answer :not(pre) > code {
   font-family: var(--font-mono-stack);
   font-size: 0.85em;
   padding: 0.12em 0.36em;
@@ -2487,8 +2635,7 @@ kbd {
   width: 100%;
   border-collapse: collapse;
   font-size: 12.5px;
-  display: block;
-  overflow-x: auto;
+  display: table;
 }
 
 .answer th,
@@ -2793,10 +2940,17 @@ kbd {
   transition: color 240ms;
 }
 
-/* The glyph sits on the text baseline rather than the line box centre. */
+.foot-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  line-height: 1;
+}
+
 .foot-github {
-  position: relative;
-  top: -0.5px;
+  display: block;
   opacity: 0.85;
 }
 
@@ -2806,6 +2960,13 @@ kbd {
 
 .foot a:hover {
   color: var(--text);
+}
+
+/* Keep the fixed Ask launcher from covering the credit on desktop widths. */
+@media (min-width: 901px) {
+  .foot {
+    padding-right: max(var(--gutter), 270px);
+  }
 }
 
 /* ---------- 14 · Keyframes ------------------------------- */
@@ -2838,6 +2999,12 @@ kbd {
 }
 
 @keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cursor-spin {
   to {
     transform: rotate(360deg);
   }
