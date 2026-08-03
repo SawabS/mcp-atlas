@@ -82,12 +82,12 @@ export type RetrievedSource = RetrievalChunk & {
   score: number;
 };
 
-export type AtlasProgress = {
+export type IndexProgress = {
   phase: "retrieving" | "ranking" | "drafting";
   sourceCount?: number;
 };
 
-export type AtlasSourceAttribution = {
+export type IndexSourceAttribution = {
   sourceId: string;
   url: string;
   title: string;
@@ -99,9 +99,9 @@ export type AtlasSourceAttribution = {
   excerpt: string;
 };
 
-export type AtlasDataParts = {
-  progress: AtlasProgress;
-  source: AtlasSourceAttribution;
+export type IndexDataParts = {
+  progress: IndexProgress;
+  source: IndexSourceAttribution;
 };
 
-export type AtlasUIMessage = UIMessage<unknown, AtlasDataParts>;
+export type IndexUIMessage = UIMessage<unknown, IndexDataParts>;

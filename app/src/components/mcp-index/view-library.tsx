@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ArrowUpRight, Layers, Search, SearchX } from "lucide-react";
-import { Reveal } from "@/components/atlas/motion";
+import { Reveal } from "@/components/mcp-index/motion";
 import type { KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
 const categories = [

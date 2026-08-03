@@ -1,6 +1,6 @@
-# MCP Atlas
+# MCP Index
 
-MCP Atlas is a source-first knowledge base for the Model Context Protocol. It combines a reproducible mirror of official MCP material, an Obsidian-compatible vault, a browser application, an active server catalogue, a concept graph, and a grounded AI guide with exact source links.
+MCP Index is a source-first knowledge base for the Model Context Protocol. It combines a reproducible mirror of official MCP material, an Obsidian-compatible vault, a browser application, an active server catalogue, a concept graph, and a grounded AI guide with exact source links.
 
 Everything for the project lives inside this `mcp-knowledge/` directory.
 

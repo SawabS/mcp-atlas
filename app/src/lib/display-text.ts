@@ -35,7 +35,7 @@ const protectedMarkdown = /```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`/g;
 export function displaySourceMarkdown(value: string, source?: MarkdownSource) {
   const segments: string[] = [];
   const protectedValue = withoutDecorativeEmoji(value).replace(protectedMarkdown, (segment) => {
-    const token = `\u0000ATLAS_SEGMENT_${segments.length}\u0000`;
+    const token = `\u0000INDEX_SEGMENT_${segments.length}\u0000`;
     segments.push(segment);
     return token;
   });
@@ -76,7 +76,7 @@ export function displaySourceMarkdown(value: string, source?: MarkdownSource) {
     .replace(/\n{4,}/g, "\n\n\n");
 
   segments.forEach((segment, index) => {
-    markdown = markdown.replace(`\u0000ATLAS_SEGMENT_${index}\u0000`, segment);
+    markdown = markdown.replace(`\u0000INDEX_SEGMENT_${index}\u0000`, segment);
   });
   return markdown;
 }

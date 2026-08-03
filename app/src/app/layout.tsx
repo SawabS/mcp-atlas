@@ -3,7 +3,7 @@ import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-import "./atlas.css";
+import "./mcp-index.css";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,12 +28,12 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MCP Atlas: the Model Context Protocol, mapped",
-    template: "%s | MCP Atlas",
+    default: "MCP Index: the Model Context Protocol, indexed",
+    template: "%s | MCP Index",
   },
   description:
-    "A source-linked atlas for the Model Context Protocol: specification, SDKs, reference servers, the Registry, and a grounded guide that cites exact commits.",
-  applicationName: "MCP Atlas",
+    "A source-linked index for the Model Context Protocol: specification, SDKs, reference servers, the Registry, and a grounded guide that cites exact commits.",
+  applicationName: "MCP Index",
   keywords: ["Model Context Protocol", "MCP", "knowledge base", "SDK", "Registry", "specification"],
 };
 
@@ -57,8 +57,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
-        <Script id="atlas-theme" strategy="beforeInteractive">
-          {`(function(){try{var t=localStorage.getItem("mcp-atlas-theme-v1");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}var r=document.documentElement;r.dataset.theme=t;r.classList.toggle("dark",t==="dark");r.style.colorScheme=t}catch(e){}})()`}
+        <Script id="index-theme" strategy="beforeInteractive">
+          {`(function(){try{var t=localStorage.getItem("mcp-index-theme-v1");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}var r=document.documentElement;r.dataset.theme=t;r.classList.toggle("dark",t==="dark");r.style.colorScheme=t}catch(e){}})()`}
         </Script>
         <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
       </body>

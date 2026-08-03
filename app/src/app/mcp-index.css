@@ -1,5 +1,5 @@
 /* ============================================================
-   MCP Atlas, the Aurora design system
+   MCP Index, the Aurora design system
    ------------------------------------------------------------
    00  Sky (backdrop)
    01  Layout + reveal
@@ -115,8 +115,8 @@
 }
 
 /* Motion+ Cursor supplies pointer tracking, press states, text sizing, and
-   reduced-motion handling. Only the visual skin belongs to Atlas. */
-[data-motion-cursor].atlas-motion-cursor {
+   reduced-motion handling. Only the visual skin belongs to MCP Index. */
+[data-motion-cursor].index-motion-cursor {
   border: 1px solid color-mix(in oklab, white 72%, var(--aqua));
   background: radial-gradient(circle at 35% 30%, white 0 10%, var(--aqua) 32%, var(--iris) 78%);
   box-shadow:
@@ -124,7 +124,7 @@
     0 0 18px color-mix(in oklab, var(--iris) 48%, transparent);
 }
 
-[data-motion-cursor].atlas-motion-cursor[data-atlas-cursor="pointer"] {
+[data-motion-cursor].index-motion-cursor[data-index-cursor="pointer"] {
   background: color-mix(in oklab, var(--iris) 34%, transparent);
   border-color: color-mix(in oklab, var(--aqua) 72%, white);
   box-shadow:
@@ -133,7 +133,7 @@
 }
 
 /* Motion's text mode becomes one luminous caret, not a tiny bordered pill. */
-[data-motion-cursor].atlas-motion-cursor[data-atlas-cursor="text"] {
+[data-motion-cursor].index-motion-cursor[data-index-cursor="text"] {
   width: 1px !important;
   border: 0;
   border-radius: 0 !important;
@@ -172,7 +172,7 @@
 
 /* ---------- 01 · Layout ---------------------------------- */
 
-.atlas {
+.mcp-index {
   position: relative;
   z-index: 1;
   display: flex;
@@ -3288,6 +3288,28 @@ kbd {
 }
 
 /* Sources disclosure */
+/* Held back until the answer is complete, so it arrives rather than sits there. */
+.sources-block {
+  animation: sources-arrive 320ms var(--ease-out) both;
+}
+
+@keyframes sources-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sources-block {
+    animation: none;
+  }
+}
+
 .sources-toggle {
   display: inline-flex;
   align-items: center;

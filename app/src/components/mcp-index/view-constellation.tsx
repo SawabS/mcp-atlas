@@ -2,8 +2,8 @@
 
 import { useDeferredValue, useMemo, useState, type CSSProperties } from "react";
 import { ArrowRight, BookOpen, FileText, Hand, Search, Waypoints } from "lucide-react";
-import { ConstellationCanvas } from "@/components/atlas/constellation-canvas";
-import { buildGraph, groupLabels, groupOrder, type NodeGroup } from "@/components/atlas/graph-model";
+import { ConstellationCanvas } from "@/components/mcp-index/constellation-canvas";
+import { buildGraph, groupLabels, groupOrder, type NodeGroup } from "@/components/mcp-index/graph-model";
 import type { GraphData, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
 const hues: Record<NodeGroup, string> = {

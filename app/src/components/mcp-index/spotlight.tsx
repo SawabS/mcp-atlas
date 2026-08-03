@@ -63,7 +63,7 @@ export function Spotlight({ open, documents, onClose, onOpen, onSearchAll }: Spo
         className="spotlight"
         role="dialog"
         aria-modal="true"
-        aria-label="Search the atlas"
+        aria-label="Search the index"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="spotlight-input">

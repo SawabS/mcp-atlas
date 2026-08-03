@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { AtlasMarkdownCode } from "@/components/ai-elements/code-block";
+import { IndexMarkdownCode } from "@/components/ai-elements/code-block";
 import { cjk } from "@streamdown/cjk";
 import { createCodePlugin } from "@streamdown/code";
 import { math } from "@streamdown/math";
@@ -335,7 +335,7 @@ export const MessageResponse = memo(
         "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className
       )}
-      components={{ ...components, code: AtlasMarkdownCode }}
+      components={{ ...components, code: IndexMarkdownCode }}
       plugins={streamdownPlugins}
       {...props}
     />

@@ -1,6 +1,6 @@
-# AI engineering in MCP Atlas
+# AI engineering in MCP Index
 
-MCP Atlas is a retrieval-augmented generation (RAG) application with a strict
+MCP Index is a retrieval-augmented generation (RAG) application with a strict
 source boundary. The language model does not browse the corpus, query a vector
 database, read the browser's data files, or call MCP tools. A server-side
 retriever selects a small evidence set first; only that evidence and the
@@ -14,7 +14,7 @@ streaming interface, and the controls that keep answers inspectable.
 ```mermaid
 flowchart LR
     user[User question]
-    browser[Ask Atlas panel]
+    browser[Ask Index panel]
     route[POST /api/chat]
     index[In-process BM25F index]
     corpus[(29,239 server-side passages)]
@@ -51,7 +51,7 @@ The model does **not** receive:
 - browser-only state, other users' conversations, or an external memory store;
 - permission to fetch a URL or execute instructions contained in a passage.
 
-This distinction matters: the model writes from evidence selected by Atlas. It
+This distinction matters: the model writes from evidence selected by MCP Index. It
 does not independently retrieve or verify evidence.
 
 ## Request lifecycle
@@ -62,7 +62,7 @@ The implementation is split across three contracts.
 | --- | --- | --- |
 | Retrieval | `app/src/lib/retrieval.ts` | Tokenize, score, apply source priors, and diversify passages |
 | Generation | `app/src/app/api/chat/route.ts` | Build the evidence-only prompt, call the selected model, and stream the result |
-| Presentation | `app/src/components/atlas/ask.tsx` | Render progress, answer text, inline citations, previews, and the source audit list |
+| Presentation | `app/src/components/mcp-index/ask.tsx` | Render progress, answer text, inline citations, previews, and the source audit list |
 
 ### 1. Submit and model routing
 

@@ -3,10 +3,10 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown, Square } from "lucide-react";
 import type { ChatStatus } from "ai";
-import type { AtlasProgress } from "@/lib/knowledge-types";
+import type { IndexProgress } from "@/lib/knowledge-types";
 
 type ChatProgressProps = {
-  progress?: AtlasProgress;
+  progress?: IndexProgress;
   sourceCount: number;
   status: ChatStatus;
   onStop: () => void;
@@ -34,12 +34,17 @@ export function ChatProgress({ progress, sourceCount, status, onStop }: ChatProg
     ? "Searching official MCP sources"
     : phase === "ranking"
       ? `Selecting the best ${count || "retrieved"} passages`
-      : "Preparing the grounded answer";
+      : "Writing the grounded answer";
 
   const steps = [
     { phase: -1, label: "Request accepted", detail: "Your question is ready for retrieval." },
     { phase: 0, label: "Search the official corpus", detail: "Find relevant passages in the local BM25F index." },
     { phase: 1, label: "Select the evidence", detail: count ? `Keep the ${count} strongest, source-diverse passages.` : "Prefer current, authoritative sources." },
+    /*
+     * The card stays up through drafting, until the first token arrives, so
+     * this last step is the one the reader watches most of the time.
+     */
+    { phase: 2, label: "Write the answer", detail: count ? `Answer from the ${count} selected passages, citing as it goes.` : "Answer from the selected passages, citing as it goes." },
   ];
   const current = phaseOrder[phase];
 

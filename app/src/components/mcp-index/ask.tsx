@@ -19,18 +19,18 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
-import { ChatProgress } from "@/components/atlas/chat-progress";
+import { ChatProgress } from "@/components/mcp-index/chat-progress";
 import {
-  atlasMessageComponents,
+  indexMessageComponents,
   CitationSourcesProvider,
-} from "@/components/atlas/citation-link";
+} from "@/components/mcp-index/citation-link";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mark } from "@/components/atlas/mark";
-import { ProviderMark, providerName, type Provider } from "@/components/atlas/provider-mark";
-import { getSourceIdentity, SourceGlyph } from "@/components/atlas/source-identity";
+import { Mark } from "@/components/mcp-index/mark";
+import { ProviderMark, providerName, type Provider } from "@/components/mcp-index/provider-mark";
+import { getSourceIdentity, SourceGlyph } from "@/components/mcp-index/source-identity";
 import { chatEndpoint } from "@/lib/client-data";
 import { displayMarkdown, displayText } from "@/lib/display-text";
-import type { AtlasUIMessage } from "@/lib/knowledge-types";
+import type { IndexUIMessage } from "@/lib/knowledge-types";
 
 const seeds = [
   "How does the stateless protocol handshake work?",
@@ -119,9 +119,14 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
 
   const active = models.find((option) => option.key === model) ?? models[0];
   const transport = useMemo(() => new DefaultChatTransport({ api: chatEndpoint(), body: { model } }), [model]);
-  const { messages, sendMessage, status, stop, error, setMessages } = useChat<AtlasUIMessage>({ transport });
+  const { messages, sendMessage, status, stop, error, setMessages } = useChat<IndexUIMessage>({ transport });
   const busy = status === "submitted" || status === "streaming";
-  const liveMessage = messages.at(-1);
+  /*
+   * While a turn is in flight the last message is the user's until the model
+   * opens its own, so the live answer is only ever the trailing assistant one.
+   */
+  const lastMessage = messages.at(-1);
+  const liveMessage = lastMessage?.role === "assistant" ? lastMessage : undefined;
   const liveSources = liveMessage?.parts.filter((part) => part.type === "source-url") ?? [];
   const liveProgress = liveMessage?.parts
     .filter((part) => part.type === "data-progress")
@@ -129,9 +134,13 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
   const liveHasText = Boolean(
     liveMessage?.parts.some((part) => part.type === "text" && part.text.trim()),
   );
-  const showRetrievalProgress = busy
-    && !liveHasText
-    && liveProgress?.phase !== "drafting";
+  /*
+   * Retrieval streams its sources before the model writes a word, so the panel
+   * would otherwise open with a source list and no answer. The progress card
+   * stands in for the whole pre-answer window, from submit to first token, and
+   * gives way the moment prose starts arriving.
+   */
+  const showRetrievalProgress = busy && !liveHasText;
 
   useEffect(() => {
     if (!open) return;
@@ -189,7 +198,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
       <aside
         ref={panelRef}
         className="ask"
-        aria-label="Ask Atlas"
+        aria-label="Ask Index"
         style={width ? ({ width: `${width}px` } as CSSProperties) : undefined}
       >
         <button className="ask-drag" type="button" aria-label="Resize panel" onPointerDown={startResize} />
@@ -197,7 +206,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
         <header className="ask-head">
           <Mark />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <strong>Ask Atlas</strong>
+            <strong>Ask Index</strong>
           </div>
           <Select value={model} onValueChange={(value) => setModel(value as ModelKey)}>
             <SelectTrigger className="model-select" size="sm" aria-label="Answer model">
@@ -242,7 +251,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                   <Sparkles size={26} />
                 </span>
                 <h3>What would you like to understand?</h3>
-                <p>Atlas retrieves the closest official passages first, then answers with links you can verify.</p>
+                <p>Index retrieves the closest official passages first, then answers with links you can verify.</p>
                 <div className="ask-seeds">
                   {seeds.map((text) => (
                     <button key={text} type="button" onClick={() => submit(text)}>
@@ -268,6 +277,19 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
               const known = new Set(sources.map((source) => source.sourceId.toUpperCase()));
               const used = citedIds(plain, known);
 
+              /*
+               * An assistant turn that has retrieved but not yet written is
+               * represented by the progress card below, not by an empty bubble.
+               */
+              if (streaming && !plain.trim()) return null;
+
+              /*
+               * Sources land while the answer is still being written. Holding
+               * them back until the turn settles keeps the reading order
+               * answer first, evidence after.
+               */
+              const showSources = sources.length > 0 && !streaming;
+
               return (
                 <div className={`turn ${message.role === "user" ? "is-user" : ""}`} key={message.id}>
                   <span className="turn-who">
@@ -275,7 +297,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                       "You"
                     ) : (
                       <>
-                        <Sparkles size={11} /> Atlas
+                        <Sparkles size={11} /> Index
                       </>
                     )}
                   </span>
@@ -299,7 +321,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                       <CitationSourcesProvider sources={attributions}>
                         {texts.map((part, index) => (
                           <MessageResponse
-                            components={atlasMessageComponents}
+                            components={indexMessageComponents}
                             key={index}
                             linkSafety={linkSafety}
                             isAnimating={streaming}
@@ -311,8 +333,8 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                     </div>
                   )}
 
-                  {sources.length > 0 && (
-                    <Sources>
+                  {showSources && (
+                    <Sources className="sources-block">
                       <SourcesTrigger className="sources-toggle source-summary" count={sources.length}>
                         <span className="source-stack" aria-hidden="true">
                           {sources.slice(0, 3).map((source) => (
@@ -388,7 +410,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
 
             {error && (
               <div className="ask-error">
-                <strong>Atlas could not answer.</strong> {readableError(error.message)}
+                <strong>Index could not answer.</strong> {readableError(error.message)}
               </div>
             )}
           </ConversationContent>
@@ -402,7 +424,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 placeholder="Ask about the protocol…"
-                aria-label="Ask Atlas a question"
+                aria-label="Ask Index a question"
               />
             </PromptInputBody>
             <PromptInputFooter className="justify-end">
@@ -410,7 +432,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
               <PromptInputSubmit status={status} onStop={stop} disabled={!input.trim() && !busy} />
             </PromptInputFooter>
           </PromptInput>
-          <p>Atlas can be wrong. Check the linked sources for anything load-bearing.</p>
+          <p>Index can be wrong. Check the linked sources for anything load-bearing.</p>
         </div>
       </aside>
     </>

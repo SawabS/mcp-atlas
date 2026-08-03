@@ -2,23 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
-import { Ask } from "@/components/atlas/ask";
-import { Constellation } from "@/components/atlas/view-constellation";
-import { CursorAura } from "@/components/atlas/cursor-aura";
-import { Library } from "@/components/atlas/view-library";
-import { Overview } from "@/components/atlas/view-overview";
-import { Reader } from "@/components/atlas/reader";
-import { Registry } from "@/components/atlas/view-registry";
-import { Rail, type AtlasView } from "@/components/atlas/rail";
-import { Sky } from "@/components/atlas/sky";
-import { Spotlight } from "@/components/atlas/spotlight";
+import { Ask } from "@/components/mcp-index/ask";
+import { Constellation } from "@/components/mcp-index/view-constellation";
+import { CursorAura } from "@/components/mcp-index/cursor-aura";
+import { Library } from "@/components/mcp-index/view-library";
+import { Overview } from "@/components/mcp-index/view-overview";
+import { Reader } from "@/components/mcp-index/reader";
+import { Registry } from "@/components/mcp-index/view-registry";
+import { Rail, type IndexView } from "@/components/mcp-index/rail";
+import { Sky } from "@/components/mcp-index/sky";
+import { Spotlight } from "@/components/mcp-index/spotlight";
 import { loadDocuments, loadGraph, loadStats } from "@/lib/client-data";
 import type { CorpusStats, GraphData, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
 type Seed = { id: number; text: string };
 
-export function Atlas({ readyModels }: { readyModels: string[] }) {
-  const [view, setView] = useState<AtlasView>("overview");
+export function McpIndex({ readyModels }: { readyModels: string[] }) {
+  const [view, setView] = useState<IndexView>("overview");
   const [documents, setDocuments] = useState<KnowledgeDocumentSummary[]>([]);
   const [stats, setStats] = useState<CorpusStats | null>(null);
   const [graph, setGraph] = useState<GraphData | null>(null);
@@ -49,7 +49,7 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
   }, []);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("mcp-atlas-theme-v1");
+    const stored = window.localStorage.getItem("mcp-index-theme-v1");
     const next =
       stored === "light" || stored === "dark"
         ? stored
@@ -81,7 +81,7 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
     document.body.dataset.locked = String(Boolean(openDocument || spotlightOpen));
   }, [openDocument, spotlightOpen]);
 
-  const navigate = useCallback((next: AtlasView) => {
+  const navigate = useCallback((next: IndexView) => {
     setView(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -118,7 +118,7 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
   const toggleTheme = useCallback(() => {
     setTheme((current) => {
       const next = current === "dark" ? "light" : "dark";
-      window.localStorage.setItem("mcp-atlas-theme-v1", next);
+      window.localStorage.setItem("mcp-index-theme-v1", next);
       applyTheme(next);
       return next;
     });
@@ -128,7 +128,7 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
     <>
       <Sky />
       <CursorAura />
-      <div className="atlas">
+      <div className="mcp-index">
         <Rail
           view={view}
           theme={theme}
@@ -181,12 +181,12 @@ export function Atlas({ readyModels }: { readyModels: string[] }) {
       </div>
 
       {!askOpen && (
-        <button className="ask-fab" type="button" onClick={() => ask()} aria-label="Ask Atlas">
+        <button className="ask-fab" type="button" onClick={() => ask()} aria-label="Ask Index">
           <span className="ask-fab-glyph">
             <Sparkles size={17} />
           </span>
           <div>
-            <b>Ask Atlas</b>
+            <b>Ask Index</b>
             <small>Grounded in exact sources</small>
           </div>
         </button>

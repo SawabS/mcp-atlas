@@ -1,4 +1,4 @@
-# MCP Atlas architecture
+# MCP Index architecture
 
 `mcp-knowledge/` is the project root and the boundary for corpus, vault, application, and deployment work.
 
@@ -13,7 +13,7 @@ flowchart TD
     vault[Obsidian vault]
     browser[Browser JSON]
     retrieval[Retrieval JSONL]
-    app[MCP Atlas web app]
+    app[MCP Index web app]
 
     upstream --> mirror
     mirror --> provenance
@@ -96,7 +96,7 @@ Retrieved passages are marked as untrusted reference data. The model is instruct
 ```mermaid
 sequenceDiagram
     actor User
-    participant Browser as MCP Atlas browser
+    participant Browser as MCP Index browser
     participant API as Chat API
     participant Index as Local retrieval index
     participant Model as NVIDIA model

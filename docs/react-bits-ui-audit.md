@@ -32,27 +32,27 @@ args = ["shadcn@latest", "mcp"]
 
 SplitText, BlurText, CircularText, TextType, Shuffle, ShinyText, TextPressure, CurvedLoop, FuzzyText, GradientText, FallingText, TextCursor, DecryptedText, TrueFocus, ScrollFloat, ScrollReveal, ASCIIText, ScrambledText, RotatingText, GlitchText, ScrollVelocity, VariableProximity, CountUp.
 
-Best Atlas opportunities: a one-time SplitText or BlurText hero entrance, CountUp for the four corpus metrics, DecryptedText for a pinned commit, and restrained GradientText for one editorial phrase. Avoid simultaneous text effects in documentation content; legibility and selectable text take priority.
+Best MCP Index opportunities: a one-time SplitText or BlurText hero entrance, CountUp for the four corpus metrics, DecryptedText for a pinned commit, and restrained GradientText for one editorial phrase. Avoid simultaneous text effects in documentation content; legibility and selectable text take priority.
 
 ### Animations — 31
 
 CursorGrid, AnimatedContent, FadeContent, ElectricBorder, OrbitImages, PixelTransition, GlareHover, Antigravity, LogoLoop, TargetCursor, MagicRings, LaserFlow, MagnetLines, GhostCursor, GradualBlur, ClickSpark, Magnet, Strands, StickerPeel, PixelTrail, Cubes, MetallicPaint, Noise, ShapeBlur, Crosshair, ImageTrail, Ribbons, SplashCursor, MetaBalls, BlobCursor, StarBorder.
 
-Best Atlas opportunities: GlareHover for the four primary category cards, StarBorder for one primary CTA, LogoLoop for an SDK-language strip, and a single FadeContent/AnimatedContent boundary around a major section. The app already has a thematic cursor and protocol orbit, so GhostCursor, BlobCursor, TargetCursor, Crosshair, OrbitImages, and MagicRings would duplicate established interactions.
+Best MCP Index opportunities: GlareHover for the four primary category cards, StarBorder for one primary CTA, LogoLoop for an SDK-language strip, and a single FadeContent/AnimatedContent boundary around a major section. The app already has a thematic cursor and protocol orbit, so GhostCursor, BlobCursor, TargetCursor, Crosshair, OrbitImages, and MagicRings would duplicate established interactions.
 
 ### Components — 40
 
 SpecularButton, OptionWheel, CurvedInput, LineSidebar, AnimatedList, ScrollStack, BubbleMenu, MagicBento, CircularGallery, ReflectiveCard, CardNav, Stack, FluidGlass, PillNav, TiltedCard, Masonry, GlassSurface, DomeGallery, ChromaGrid, Folder, StaggeredMenu, ModelViewer, Lanyard, ProfileCard, Dock, GooeyNav, PixelCard, Carousel, SpotlightCard, BorderGlow, FlyingPosters, CardSwap, GlassIcons, DecayCard, FlowingMenu, ElasticSlider, Counter, InfiniteMenu, Stepper, BounceCards.
 
-Best Atlas opportunities: AnimatedList for a short search result set, ChromaGrid or MagicBento for a curated landing-page collection, Folder for grouped SDK resources, and Stepper for build-server/client tutorials. The existing rail, pills, search, and reader already cover CardNav, Dock, PillNav, CurvedInput, and LineSidebar. Masonry is a poor fit for dense reference cards because stable rows scan faster.
+Best MCP Index opportunities: AnimatedList for a short search result set, ChromaGrid or MagicBento for a curated landing-page collection, Folder for grouped SDK resources, and Stepper for build-server/client tutorials. The existing rail, pills, search, and reader already cover CardNav, Dock, PillNav, CurvedInput, and LineSidebar. Masonry is a poor fit for dense reference cards because stable rows scan faster.
 
 ### Backgrounds — 45
 
 Ferrofluid, Lightfall, LiquidEther, Prism, DarkVeil, LightPillar, Silk, FloatingLines, SideRays, LightRays, PixelBlast, ColorBends, EvilEye, LineWaves, Radar, SoftAurora, Aurora, Plasma, PlasmaWave, Particles, GradientBlinds, Grainient, GridScan, Beams, PixelSnow, Lightning, PrismaticBurst, Galaxy, Dither, FaultyTerminal, RippleGrid, DotField, DotGrid, Threads, Hyperspeed, Iridescence, Waves, GridDistortion, Ballpit, Orb, LetterGlitch, GridMotion, ShapeGrid, LiquidChrome, Balatro.
 
-Best Atlas opportunities: at most one lazy-loaded atmospheric background, with a static fallback and automatic suspension for reduced motion and hidden tabs. SoftAurora, Aurora, Threads, or DotGrid align with the product language. The adopted SoftAurora is blended into the existing sky at very low opacity instead of competing with the orbit or constellation.
+Best MCP Index opportunities: at most one lazy-loaded atmospheric background, with a static fallback and automatic suspension for reduced motion and hidden tabs. SoftAurora, Aurora, Threads, or DotGrid align with the product language. The adopted SoftAurora is blended into the existing sky at very low opacity instead of competing with the orbit or constellation.
 
-## Adoption matrix for MCP Atlas
+## Adoption matrix for MCP Index
 
 | Tier | Components | Recommended use | Guardrail |
 | --- | --- | --- | --- |
@@ -80,7 +80,7 @@ Best Atlas opportunities: at most one lazy-loaded atmospheric background, with a
 - Removed repeated `backdrop-filter` from document and registry cards.
 - Limited hover motion to composited `transform`, with shorter timing and no animated shadow.
 - Added `content-visibility: auto` and intrinsic sizing to long card grids so off-screen cards can skip rendering work.
-- Added reduced-motion behavior for Atlas and imported React Bits effects.
+- Added reduced-motion behavior for MCP Index and imported React Bits effects.
 - Kept React Bits effects concentrated on the page atmosphere and four overview cards rather than multiplying them across 36–48 result cards.
 - Adapted SoftAurora to composited CSS fog bands, eliminating its WebGL loop and `ogl` dependency while preserving a static reduced-motion frame.
 - Adapted DecryptedText to use native React spans, avoiding an otherwise unnecessary Motion runtime.

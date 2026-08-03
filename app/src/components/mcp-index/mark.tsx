@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 /**
- * Atlas mark: three protocol nodes (host, client, server) joined by a fixed
+ * Index mark: three protocol nodes (host, client, server) joined by a fixed
  * link ring. The ring never moves. A pulse of light travels along it and flares
  * each node as it arrives, so the energy is what animates, not the link.
  *

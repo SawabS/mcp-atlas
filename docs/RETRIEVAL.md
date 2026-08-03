@@ -1,6 +1,6 @@
-# How Atlas answers a question
+# How MCP Index answers a question
 
-Atlas answers from the mirrored corpus, never from model memory. This document
+MCP Index answers from the mirrored corpus, never from model memory. This document
 traces one question end to end, from keystroke to a citation that resolves to an
 exact commit.
 

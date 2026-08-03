@@ -2,7 +2,7 @@ import type { GraphData, KnowledgeDocumentSummary } from "@/lib/knowledge-types"
 
 export type NodeGroup = "core" | "primitive" | "security" | "ecosystem" | "document";
 
-export type AtlasNode = {
+export type IndexNode = {
   id: string;
   label: string;
   kind: "concept" | "document";
@@ -17,11 +17,11 @@ export type AtlasNode = {
   phase: number;
 };
 
-export type AtlasEdge = { source: number; target: number; strong: boolean };
+export type IndexEdge = { source: number; target: number; strong: boolean };
 
-export type AtlasGraph = {
-  nodes: AtlasNode[];
-  edges: AtlasEdge[];
+export type IndexGraph = {
+  nodes: IndexNode[];
+  edges: IndexEdge[];
   index: Map<string, number>;
   neighbours: number[][];
 };
@@ -55,9 +55,9 @@ export function buildGraph(
   graph: GraphData | null,
   documents: KnowledgeDocumentSummary[],
   includeDocuments: boolean,
-): AtlasGraph {
-  const nodes: AtlasNode[] = [];
-  const edges: AtlasEdge[] = [];
+): IndexGraph {
+  const nodes: IndexNode[] = [];
+  const edges: IndexEdge[] = [];
   const index = new Map<string, number>();
 
   const concepts = graph?.nodes ?? [];

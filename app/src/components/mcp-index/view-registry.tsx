@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Box, Cloud, GitFork, LoaderCircle, Package, Search, Signal } from "lucide-react";
-import { Reveal } from "@/components/atlas/motion";
-import { ServerSheet } from "@/components/atlas/server-sheet";
+import { Reveal } from "@/components/mcp-index/motion";
+import { ServerSheet } from "@/components/mcp-index/server-sheet";
 import { loadRegistry } from "@/lib/client-data";
 import type { RegistryServer } from "@/lib/knowledge-types";
 

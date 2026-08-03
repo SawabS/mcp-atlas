@@ -2,12 +2,12 @@
 
 import type { CSSProperties } from "react";
 import { Compass, Library, Moon, Search, Server, Sparkles, Sun, Waypoints } from "lucide-react";
-import { Mark } from "@/components/atlas/mark";
-import { useScrolled } from "@/components/atlas/motion";
+import { Mark } from "@/components/mcp-index/mark";
+import { useScrolled } from "@/components/mcp-index/motion";
 
-export type AtlasView = "overview" | "library" | "map" | "registry";
+export type IndexView = "overview" | "library" | "map" | "registry";
 
-export const views: Array<{ id: AtlasView; label: string; icon: typeof Compass }> = [
+export const views: Array<{ id: IndexView; label: string; icon: typeof Compass }> = [
   { id: "overview", label: "Overview", icon: Compass },
   { id: "library", label: "Library", icon: Library },
   { id: "map", label: "Constellation", icon: Waypoints },
@@ -15,9 +15,9 @@ export const views: Array<{ id: AtlasView; label: string; icon: typeof Compass }
 ];
 
 type RailProps = {
-  view: AtlasView;
+  view: IndexView;
   theme: "dark" | "light";
-  onNavigate: (view: AtlasView) => void;
+  onNavigate: (view: IndexView) => void;
   onSearch: () => void;
   onToggleTheme: () => void;
   onAsk: () => void;
@@ -30,10 +30,10 @@ export function Rail({ view, theme, onNavigate, onSearch, onToggleTheme, onAsk }
   return (
     <>
       <header className="rail" data-elevated={elevated}>
-        <button className="rail-brand" type="button" onClick={() => onNavigate("overview")} aria-label="MCP Atlas home">
+        <button className="rail-brand" type="button" onClick={() => onNavigate("overview")} aria-label="MCP Index home">
           <Mark />
           <span>
-            MCP <em>Atlas</em>
+            MCP <em>Index</em>
           </span>
         </button>
 
@@ -56,7 +56,7 @@ export function Rail({ view, theme, onNavigate, onSearch, onToggleTheme, onAsk }
         </nav>
 
         <div className="rail-tools">
-          <button className="rail-search" type="button" onClick={onSearch} aria-label="Search the atlas">
+          <button className="rail-search" type="button" onClick={onSearch} aria-label="Search the index">
             <Search size={15} />
             <span>Search</span>
             <kbd>⌘K</kbd>
@@ -71,7 +71,7 @@ export function Rail({ view, theme, onNavigate, onSearch, onToggleTheme, onAsk }
           </button>
           <button className="btn btn-sm btn-primary" type="button" onClick={onAsk}>
             <Sparkles size={15} />
-            <span>Ask Atlas</span>
+            <span>Ask Index</span>
           </button>
         </div>
       </header>

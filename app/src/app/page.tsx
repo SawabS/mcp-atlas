@@ -1,4 +1,4 @@
-import { Atlas } from "@/components/atlas/atlas";
+import { McpIndex } from "@/components/mcp-index/mcp-index";
 import { availableModels } from "@/lib/models";
 
 export default function Home() {
@@ -11,5 +11,5 @@ export default function Home() {
     .filter((model) => model.ready)
     .map((model) => model.key);
 
-  return <Atlas readyModels={readyModels} />;
+  return <McpIndex readyModels={readyModels} />;
 }

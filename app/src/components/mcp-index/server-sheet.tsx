@@ -26,7 +26,7 @@ type ServerSheetProps = {
 
 /**
  * A registry record read as a page rather than a redirect. The body is markdown
- * that Atlas composes from the record, so it renders with the same typography
+ * that Index composes from the record, so it renders with the same typography
  * as every other document in the app.
  */
 export function ServerSheet({ server, onClose, onAsk }: ServerSheetProps) {
@@ -135,7 +135,7 @@ export function ServerSheet({ server, onClose, onAsk }: ServerSheetProps) {
               <p className="lede">{server.description || "This record carries no description."}</p>
               <div className="doc-actions">
                 <button className="btn btn-sm btn-primary" type="button" onClick={ask}>
-                  <Sparkles size={14} /> Ask Atlas about this server
+                  <Sparkles size={14} /> Ask Index about this server
                 </button>
                 {server.repositoryUrl && (
                   <a className="btn btn-sm" href={server.repositoryUrl} target="_blank" rel="noreferrer">
@@ -220,7 +220,7 @@ export function ServerSheet({ server, onClose, onAsk }: ServerSheetProps) {
             <div className="meta-block">
               <span className="eyebrow">Safety</span>
               <p className="meta-note">
-                Registry records are third-party metadata. Atlas lists packages and endpoints and never fetches,
+                Registry records are third-party metadata. Index lists packages and endpoints and never fetches,
                 installs, or runs them.
               </p>
             </div>

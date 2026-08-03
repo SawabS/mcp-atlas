@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Crosshair, Minus, Plus } from "lucide-react";
-import type { AtlasGraph, NodeGroup } from "@/components/atlas/graph-model";
+import type { IndexGraph, NodeGroup } from "@/components/mcp-index/graph-model";
 
 type Camera = { x: number; y: number; scale: number };
 
@@ -14,7 +14,7 @@ type Camera = { x: number; y: number; scale: number };
 const TRAVEL = 0.82;
 
 type ConstellationCanvasProps = {
-  graph: AtlasGraph;
+  graph: IndexGraph;
   selectedId: string;
   theme: "dark" | "light";
   onSelect: (id: string) => void;

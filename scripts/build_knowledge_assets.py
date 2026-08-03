@@ -195,7 +195,7 @@ def normalize_mdx_components(text: str) -> str:
     protected: list[str] = []
 
     def protect(match: re.Match[str]) -> str:
-        token = f"\0ATLAS_SEGMENT_{len(protected)}\0"
+        token = f"\0INDEX_SEGMENT_{len(protected)}\0"
         protected.append(match.group(0))
         return token
 
@@ -241,7 +241,7 @@ def normalize_mdx_components(text: str) -> str:
     value = re.sub(r"\n{4,}", "\n\n\n", value)
 
     for index, segment in enumerate(protected):
-        value = value.replace(f"\0ATLAS_SEGMENT_{index}\0", segment)
+        value = value.replace(f"\0INDEX_SEGMENT_{index}\0", segment)
     return value
 
 

@@ -10,5 +10,5 @@ export function CursorAura() {
 
   if (shouldReduceMotion) return null;
 
-  return <Cursor className="atlas-motion-cursor" data-atlas-cursor={cursor.type} />;
+  return <Cursor className="index-motion-cursor" data-index-cursor={cursor.type} />;
 }

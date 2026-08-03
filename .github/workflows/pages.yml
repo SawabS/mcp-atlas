@@ -1,4 +1,4 @@
-name: Publish MCP Atlas to GitHub Pages
+name: Publish MCP Index to GitHub Pages
 
 on:
   push:

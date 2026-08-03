@@ -1,6 +1,6 @@
-# MCP Atlas web application
+# MCP Index web application
 
-This directory contains the browser interface and grounded chat backend for the MCP Atlas knowledge base.
+This directory contains the browser interface and grounded chat backend for the MCP Index knowledge base.
 
 The interface includes a source-linked home dashboard, searchable library, document reader, active Registry catalogue, and an Obsidian-style interactive graph. A purpose-built canvas renderer draws the deterministic constellation and keeps its camera, adjacency index, and label collision pass outside React. Dark and light themes, responsive navigation, and a resizable grounded chat panel are included.
 

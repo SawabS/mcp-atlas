@@ -14,8 +14,8 @@ import {
 import GlareHover from "@/components/GlareHover";
 import StarBorder from "@/components/StarBorder";
 import DecryptedText from "@/components/DecryptedText";
-import { Mark } from "@/components/atlas/mark";
-import { Reveal } from "@/components/atlas/motion";
+import { Mark } from "@/components/mcp-index/mark";
+import { Reveal } from "@/components/mcp-index/motion";
 import type { CorpusStats, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
 type OverviewProps = {
@@ -77,7 +77,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
       <section className="hero">
         <Reveal className="hero-copy">
           <span className="eyebrow">
-            <i className="spark" /> Model Context Protocol · living atlas
+            <i className="spark" /> Model Context Protocol · living index
           </span>
           <h1 className="display">
             The protocol,
@@ -86,7 +86,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
           </h1>
           <p className="lede">
             Specification, SDKs, reference servers and the live Registry, cross-linked into a single
-            atlas where every claim stays pinned to the commit it came from.
+            index where every claim stays pinned to the commit it came from.
           </p>
           <div className="hero-actions">
             <StarBorder
@@ -99,7 +99,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
               Explore the library <ArrowRight size={16} />
             </StarBorder>
             <button className="btn" type="button" onClick={() => onAsk()}>
-              <Sparkles size={15} /> Ask Atlas anything
+              <Sparkles size={15} /> Ask Index anything
             </button>
           </div>
           <dl className="hero-stats">

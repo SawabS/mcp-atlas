@@ -164,7 +164,7 @@ function DownloadCodeButton({ code, language }: { code: string; language: string
 
 type MarkdownCodeProps = ComponentProps<"code"> & ExtraProps;
 
-export function AtlasMarkdownCode({ children, className, node: _node, ...props }: MarkdownCodeProps) {
+export function IndexMarkdownCode({ children, className, node: _node, ...props }: MarkdownCodeProps) {
   void _node;
   const attributes = props as Record<string, unknown>;
   const isBlock = "data-block" in attributes;

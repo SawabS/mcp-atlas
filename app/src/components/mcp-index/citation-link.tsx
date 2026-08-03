@@ -10,10 +10,10 @@ import {
 } from "react";
 import { ExternalLink } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { getSourceIdentity, SourceGlyph } from "@/components/atlas/source-identity";
-import type { AtlasSourceAttribution } from "@/lib/knowledge-types";
+import { getSourceIdentity, SourceGlyph } from "@/components/mcp-index/source-identity";
+import type { IndexSourceAttribution } from "@/lib/knowledge-types";
 
-const EMPTY_SOURCES = new Map<string, AtlasSourceAttribution>();
+const EMPTY_SOURCES = new Map<string, IndexSourceAttribution>();
 const CitationSourcesContext = createContext(EMPTY_SOURCES);
 
 export function CitationSourcesProvider({
@@ -21,7 +21,7 @@ export function CitationSourcesProvider({
   sources,
 }: {
   children: ReactNode;
-  sources: AtlasSourceAttribution[];
+  sources: IndexSourceAttribution[];
 }) {
   const value = useMemo(
     () => new Map(sources.map((source) => [source.sourceId.toUpperCase(), source])),
@@ -37,7 +37,7 @@ function childText(children: ReactNode): string {
     .trim();
 }
 
-export function AtlasAnswerLink({ children, href = "", ...props }: ComponentProps<"a">) {
+export function IndexAnswerLink({ children, href = "", ...props }: ComponentProps<"a">) {
   const sources = useContext(CitationSourcesContext);
   const label = childText(children).toUpperCase();
   const source = /^S\d+$/.test(label) ? sources.get(label) : undefined;
@@ -90,4 +90,4 @@ export function AtlasAnswerLink({ children, href = "", ...props }: ComponentProp
   );
 }
 
-export const atlasMessageComponents = { a: AtlasAnswerLink };
+export const indexMessageComponents = { a: IndexAnswerLink };
