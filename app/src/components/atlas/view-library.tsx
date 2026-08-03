@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ArrowUpRight, Layers, Search, SearchX } from "lucide-react";
-import { Reveal, useLit } from "@/components/atlas/motion";
+import { Reveal } from "@/components/atlas/motion";
 import type { KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
 const categories = [
@@ -42,7 +42,6 @@ type LibraryProps = {
 export function Library({ documents, query, category, onQuery, onCategory, onOpen }: LibraryProps) {
   const [limit, setLimit] = useState(PAGE);
   const [filterKey, setFilterKey] = useState(`${query}|${category}`);
-  const lit = useLit();
 
   // Reset paging whenever the filters change, without an extra render pass.
   if (filterKey !== `${query}|${category}`) {
@@ -122,8 +121,7 @@ export function Library({ documents, query, category, onQuery, onCategory, onOpe
                 <Reveal key={document.id} delay={Math.min(index, 11) * 34}>
                   <button
                     type="button"
-                    className="card doc-card lit"
-                    onPointerMove={lit}
+                    className="card doc-card"
                     onClick={() => onOpen(document.id)}
                   >
                     <div className="doc-card-top">

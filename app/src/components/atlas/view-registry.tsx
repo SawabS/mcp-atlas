@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Box, Cloud, GitFork, LoaderCircle, Package, Search, Signal } from "lucide-react";
-import { Reveal, useLit } from "@/components/atlas/motion";
+import { Reveal } from "@/components/atlas/motion";
 import { ServerSheet } from "@/components/atlas/server-sheet";
 import { loadRegistry } from "@/lib/client-data";
 import type { RegistryServer } from "@/lib/knowledge-types";
@@ -16,7 +16,6 @@ export function Registry({ onAsk }: { onAsk: (question: string) => void }) {
   const [limit, setLimit] = useState(PAGE);
   const [filterKey, setFilterKey] = useState("|all");
   const [open, setOpen] = useState<RegistryServer | null>(null);
-  const lit = useLit();
 
   if (filterKey !== `${query}|${transport}`) {
     setFilterKey(`${query}|${transport}`);
@@ -113,7 +112,7 @@ export function Registry({ onAsk }: { onAsk: (question: string) => void }) {
             <div className="card-grid">
               {results.slice(0, limit).map((server, index) => (
                 <Reveal key={`${server.id}-${index}`} delay={Math.min(index, 11) * 30}>
-                  <ServerCard server={server} onPointerMove={lit} onOpen={() => setOpen(server)} />
+                  <ServerCard server={server} onOpen={() => setOpen(server)} />
                 </Reveal>
               ))}
             </div>
@@ -139,11 +138,9 @@ export function Registry({ onAsk }: { onAsk: (question: string) => void }) {
 
 function ServerCard({
   server,
-  onPointerMove,
   onOpen,
 }: {
   server: RegistryServer;
-  onPointerMove: React.PointerEventHandler<HTMLElement>;
   onOpen: () => void;
 }) {
   const href = server.repositoryUrl || server.websiteUrl || server.remotes[0]?.url || undefined;
@@ -154,7 +151,7 @@ function ServerCard({
   ].slice(0, 3);
 
   return (
-    <article className="card server-card lit" onPointerMove={onPointerMove}>
+    <article className="card server-card">
       {/*
        * The whole card opens the record. The outbound link stays above it so
        * both destinations remain reachable by pointer and by keyboard.

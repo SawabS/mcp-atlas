@@ -11,8 +11,10 @@ import {
   ScrollText,
   Sparkles,
 } from "lucide-react";
+import GlareHover from "@/components/GlareHover";
+import StarBorder from "@/components/StarBorder";
 import { Mark } from "@/components/atlas/mark";
-import { Reveal, useLit } from "@/components/atlas/motion";
+import { Reveal } from "@/components/atlas/motion";
 import type { CorpusStats, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
 type OverviewProps = {
@@ -24,8 +26,6 @@ type OverviewProps = {
 };
 
 export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: OverviewProps) {
-  const lit = useLit();
-
   const featured = useMemo(() => {
     const spec = documents.filter((document) => document.category === "Specification");
     const current = spec.filter((document) => document.sourcePath.includes("2026-07-28"));
@@ -88,9 +88,15 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
             atlas where every claim stays pinned to the commit it came from.
           </p>
           <div className="hero-actions">
-            <button className="btn btn-primary" type="button" onClick={() => onBrowse()}>
+            <StarBorder
+              className="hero-star-btn"
+              type="button"
+              color="var(--aqua)"
+              speed="5.4s"
+              onClick={() => onBrowse()}
+            >
               Explore the library <ArrowRight size={16} />
-            </button>
+            </StarBorder>
             <button className="btn" type="button" onClick={() => onAsk()}>
               <Sparkles size={15} /> Ask Atlas anything
             </button>
@@ -124,25 +130,37 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
           {ways.map((way) => {
             const Icon = way.icon;
             return (
-              <button
+              <GlareHover
                 key={way.label}
-                type="button"
-                className="card way lit"
-                onPointerMove={lit}
-                onClick={() => onBrowse(way.label)}
+                className="way-glare"
+                width="100%"
+                height="100%"
+                background="transparent"
+                borderRadius="var(--r-md)"
+                borderColor="transparent"
+                glareColor="#ffffff"
+                glareOpacity={0.1}
+                glareSize={180}
+                transitionDuration={620}
                 style={{ "--hue": way.hue, "--tint": way.tint } as React.CSSProperties}
               >
-                <span className="way-glyph">
-                  <Icon size={19} />
-                </span>
-                <h3>{way.label}</h3>
-                <p>{way.copy}</p>
-                <span className="way-meta">
-                  <b>{way.count ? way.count.toLocaleString("en-US") : "···"}</b>
-                  {way.unit}
-                  <ArrowRight size={15} />
-                </span>
-              </button>
+                <button
+                  type="button"
+                  className="card way"
+                  onClick={() => onBrowse(way.label)}
+                >
+                  <span className="way-glyph">
+                    <Icon size={19} />
+                  </span>
+                  <h3>{way.label}</h3>
+                  <p>{way.copy}</p>
+                  <span className="way-meta">
+                    <b>{way.count ? way.count.toLocaleString("en-US") : "···"}</b>
+                    {way.unit}
+                    <ArrowRight size={15} />
+                  </span>
+                </button>
+              </GlareHover>
             );
           })}
         </div>
@@ -178,7 +196,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="pane aside-card lit" onPointerMove={lit}>
+          <div className="pane aside-card">
             <span className="eyebrow">
               <GitCommitHorizontal size={14} /> Provenance
             </span>
