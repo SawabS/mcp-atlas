@@ -1,4 +1,56 @@
 .soft-aurora-container {
+  position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  filter: brightness(var(--soft-aurora-brightness));
+}
+
+.soft-aurora-container i {
+  position: absolute;
+  display: block;
+  width: 72%;
+  aspect-ratio: 1.7;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.soft-aurora-container i:nth-child(1) {
+  top: 4%;
+  left: -8%;
+  background: radial-gradient(ellipse, color-mix(in oklab, var(--soft-aurora-a) 64%, transparent), transparent 68%);
+  animation: soft-aurora-a calc(32s / var(--soft-aurora-speed)) ease-in-out infinite alternate;
+}
+
+.soft-aurora-container i:nth-child(2) {
+  top: 22%;
+  right: -14%;
+  background: radial-gradient(ellipse, color-mix(in oklab, var(--soft-aurora-b) 58%, transparent), transparent 70%);
+  animation: soft-aurora-b calc(38s / var(--soft-aurora-speed)) ease-in-out infinite alternate;
+}
+
+.soft-aurora-container i:nth-child(3) {
+  top: -10%;
+  left: 24%;
+  background: radial-gradient(ellipse, color-mix(in oklab, var(--soft-aurora-a) 34%, var(--soft-aurora-b)), transparent 66%);
+  animation: soft-aurora-c calc(44s / var(--soft-aurora-speed)) ease-in-out infinite alternate;
+}
+
+@keyframes soft-aurora-a {
+  to { transform: translate3d(18%, 12%, 0) rotate(7deg) scale(1.08); }
+}
+
+@keyframes soft-aurora-b {
+  to { transform: translate3d(-16%, -9%, 0) rotate(-9deg) scale(1.12); }
+}
+
+@keyframes soft-aurora-c {
+  to { transform: translate3d(8%, 20%, 0) rotate(5deg) scale(0.94); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soft-aurora-container i {
+    animation: none;
+    will-change: auto;
+  }
 }

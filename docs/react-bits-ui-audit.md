@@ -59,7 +59,7 @@ Best Atlas opportunities: at most one lazy-loaded atmospheric background, with a
 | Adopted | GlareHover | Four overview entry cards | CSS-only and hover-triggered; no pointer geometry reads |
 | Adopted | StarBorder | Primary “Explore the library” CTA | One instance; disabled for reduced motion |
 | Adopted | DecryptedText | Four overview card titles | Hover-only; Motion dependency removed from the imported source |
-| Adopted | SoftAurora | Fixed atmospheric sky | Lazy-loaded, 30 FPS cap, 1.25 DPR cap, pauses when hidden or reduced-motion |
+| Adopted | SoftAurora | Fixed atmospheric sky | Adapted to CSS transforms; no WebGL loop or runtime dependency |
 | Existing equivalent | CountUp | Corpus totals | Current local implementation only runs while values settle and is lighter than adding Motion |
 | Existing equivalent | Target/Ghost cursor | Shooting-star ball, tail, and glitter | Keep one passive global listener and one cursor system |
 | Existing equivalent | OrbitImages/MagicRings | Protocol orbit | Keep the semantic Tools/Resources/Prompts orbit |
@@ -82,7 +82,7 @@ Best Atlas opportunities: at most one lazy-loaded atmospheric background, with a
 - Added `content-visibility: auto` and intrinsic sizing to long card grids so off-screen cards can skip rendering work.
 - Added reduced-motion behavior for Atlas and imported React Bits effects.
 - Kept React Bits effects concentrated on the page atmosphere and four overview cards rather than multiplying them across 36–48 result cards.
-- Adapted SoftAurora to cap rendering at 30 FPS and 1.25 DPR, pause in hidden tabs, and render a static frame for reduced-motion users.
+- Adapted SoftAurora to composited CSS fog bands, eliminating its WebGL loop and `ogl` dependency while preserving a static reduced-motion frame.
 - Adapted DecryptedText to use native React spans, avoiding an otherwise unnecessary Motion runtime.
 
 ## MCP prompts for future passes
