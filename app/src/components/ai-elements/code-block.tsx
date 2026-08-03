@@ -1,15 +1,18 @@
 "use client";
 
-import { CheckIcon, CopyIcon, DownloadIcon, XIcon } from "lucide-react";
+import { mermaid } from "@streamdown/mermaid";
+import { CheckIcon, CopyIcon, DownloadIcon, Maximize2Icon, XIcon } from "lucide-react";
 import {
   isValidElement,
   type ComponentProps,
   type ReactNode,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
 import { CodeBlock, type ExtraProps } from "streamdown";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 type ActionState = "idle" | "success" | "error";
 
@@ -27,6 +30,7 @@ const languageExtensions: Record<string, string> = {
   jsx: "jsx",
   kotlin: "kt",
   markdown: "md",
+  mermaid: "mmd",
   php: "php",
   python: "py",
   ruby: "rb",
@@ -162,6 +166,86 @@ function DownloadCodeButton({ code, language }: { code: string; language: string
   );
 }
 
+function FullscreenButton({ title, children }: { title: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button aria-label={`Expand ${title}`} data-code-action="fullscreen" title={`Expand ${title}`} type="button">
+          <Maximize2Icon aria-hidden size={15} />
+        </button>
+      </DialogTrigger>
+      <DialogContent className="code-fullscreen-dialog">
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        <div className="code-fullscreen-body">{children}</div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * IndexMarkdownCode (below) replaces streamdown's default `code` renderer
+ * entirely, which is also what detects and renders mermaid fences — so
+ * without this, a ```mermaid block would just show as highlighted text.
+ * This renders the diagram directly against the same mermaid plugin
+ * instance streamdown's own plugin config uses.
+ */
+function MermaidDiagram({ code }: { code: string }) {
+  const [svg, setSvg] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const id = `mermaid-${useId().replace(/:/g, "")}`;
+
+  // The parent keys this component by `code`, so a new diagram is a fresh
+  // mount with fresh initial state — no manual reset needed here.
+  useEffect(() => {
+    let live = true;
+    mermaid
+      .getMermaid()
+      .render(id, code)
+      .then(({ svg: rendered }) => {
+        if (live) setSvg(rendered);
+      })
+      .catch((cause: unknown) => {
+        if (live) setError(cause instanceof Error ? cause.message : "Failed to render diagram.");
+      });
+    return () => {
+      live = false;
+    };
+  }, [code, id]);
+
+  // A diagram that fails to parse still has a source worth reading, so
+  // fall back to the plain code view rather than showing nothing.
+  if (error) {
+    return (
+      <CodeBlock code={code} language="mermaid">
+        <DownloadCodeButton code={code} language="mermaid" />
+        <CopyCodeButton code={code} />
+      </CodeBlock>
+    );
+  }
+
+  const diagram = svg ? (
+    <div className="mermaid-block-svg" dangerouslySetInnerHTML={{ __html: svg }} />
+  ) : (
+    <span className="mermaid-block-status">Rendering diagram…</span>
+  );
+
+  return (
+    <div className="mermaid-block">
+      <div className="mermaid-block-header">
+        <span>mermaid</span>
+        <div className="mermaid-block-actions">
+          <DownloadCodeButton code={code} language="mermaid" />
+          <CopyCodeButton code={code} />
+          {svg && <FullscreenButton title="mermaid diagram">{diagram}</FullscreenButton>}
+        </div>
+      </div>
+      <div className="mermaid-block-body">{diagram}</div>
+    </div>
+  );
+}
+
 type MarkdownCodeProps = ComponentProps<"code"> & ExtraProps;
 
 export function IndexMarkdownCode({ children, className, node: _node, ...props }: MarkdownCodeProps) {
@@ -176,10 +260,17 @@ export function IndexMarkdownCode({ children, className, node: _node, ...props }
   const language = className?.match(/language-([\w#+.-]+)/)?.[1] ?? "text";
   const code = childrenToText(children).replace(/\n$/, "");
 
+  if (language === "mermaid") {
+    return <MermaidDiagram code={code} key={code} />;
+  }
+
   return (
     <CodeBlock code={code} language={language}>
       <DownloadCodeButton code={code} language={language} />
       <CopyCodeButton code={code} />
+      <FullscreenButton title={`${language} code`}>
+        <CodeBlock code={code} language={language} />
+      </FullscreenButton>
     </CodeBlock>
   );
 }

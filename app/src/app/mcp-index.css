@@ -2258,6 +2258,93 @@ kbd {
   border-top: 1px solid var(--line) !important;
 }
 
+/* Streamdown portals its table-fullscreen view straight to <body> at a
+   fixed z-50, which sits below this app's own overlays (Ask panel z-85,
+   Reader scrim z-90, Spotlight z-100) — so expanding a table from inside
+   either rendered invisibly behind them. */
+[data-streamdown="table-fullscreen"] {
+  z-index: 110 !important;
+}
+
+/* Mermaid diagrams render through our own MermaidDiagram (see
+   code-block.tsx), styled to match the code-block shell rather than
+   streamdown's default, since streamdown's own code renderer is bypassed
+   by IndexMarkdownCode. */
+.mermaid-block {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: color-mix(in oklab, var(--paper) 72%, transparent);
+}
+
+.mermaid-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 42px;
+  padding-inline: 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-3);
+  font-family: var(--font-mono-stack);
+  font-size: 12px;
+  text-transform: lowercase;
+}
+
+.mermaid-block-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mermaid-block-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 18px;
+  overflow: auto;
+}
+
+.mermaid-block-status {
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.mermaid-block-svg svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fullscreen viewer for code blocks and mermaid diagrams. Reuses the shared
+   Dialog primitive (see dialog.tsx), sized up instead of the default
+   small-dialog treatment. */
+.code-fullscreen-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(1100px, 92vw);
+  height: min(760px, 88vh);
+  max-width: none;
+  padding: 0;
+}
+
+.code-fullscreen-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: auto;
+  padding: 16px;
+}
+
+.code-fullscreen-body [data-streamdown="code-block"] {
+  flex: 1;
+}
+
+.code-fullscreen-body .mermaid-block {
+  flex: 1;
+}
+
 [data-code-action] {
   display: inline-flex;
   width: 28px;
