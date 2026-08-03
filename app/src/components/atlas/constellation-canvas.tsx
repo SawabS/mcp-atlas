@@ -95,7 +95,10 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
 
   /* Focus the selection */
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId) {
+      fit();
+      return;
+    }
     const nodeIndex = graph.index.get(selectedId);
     if (nodeIndex === undefined) return;
     const node = graph.nodes[nodeIndex];
@@ -104,7 +107,7 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
       y: -node.y,
       scale: Math.max(cameraRef.current.scale, node.kind === "concept" ? 0.42 : 0.8),
     };
-  }, [graph, selectedId]);
+  }, [fit, graph, selectedId]);
 
   /* Render loop */
   useEffect(() => {
@@ -175,8 +178,8 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
         const sx = source.x;
         const sy = source.y + wobble(activeIndex);
 
-        context.lineWidth = 1.6 / camera.scale;
-        context.strokeStyle = withAlpha(colour, 0.75);
+        context.lineWidth = 1.25 / camera.scale;
+        context.strokeStyle = withAlpha(colour, 0.46);
         context.beginPath();
         edges.forEach((edge) => {
           if (edge.source !== activeIndex && edge.target !== activeIndex) return;
@@ -188,14 +191,14 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
         context.stroke();
 
         /*
-         * A pulse leaves the active node, travels the link, then hands its
-         * remaining energy to the far node as a short flare. Each link is
-         * offset so the pulses do not fire in unison.
+         * A short luminous current travels each active link. The energy is a
+         * layered, tapered stroke rather than a bead, so it reads as an aura
+         * moving through the connection instead of a dot sliding over it.
          */
         context.save();
-        context.fillStyle = colour;
+        context.lineCap = "round";
         context.shadowColor = colour;
-        context.shadowBlur = 12 / camera.scale;
+        context.beginPath();
         edges.forEach((edge, e) => {
           if (edge.source !== activeIndex && edge.target !== activeIndex) return;
           const farIndex = edge.source === activeIndex ? edge.target : edge.source;
@@ -208,18 +211,26 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
             return;
           }
 
-          const progress = phase / TRAVEL;
-          context.globalAlpha = Math.min(1, Math.sin(Math.PI * progress) * 1.8);
-          context.beginPath();
-          context.arc(
-            sx + (far.x - sx) * progress,
-            sy + (far.y + wobble(farIndex) - sy) * progress,
-            2.4 / camera.scale,
-            0,
-            Math.PI * 2,
-          );
-          context.fill();
+          const rawProgress = phase / TRAVEL;
+          const progress = 0.5 - Math.cos(Math.PI * rawProgress) / 2;
+          const start = Math.max(0, progress - 0.16);
+          const end = Math.min(1, progress + 0.055);
+          const farY = far.y + wobble(farIndex);
+          context.moveTo(sx + (far.x - sx) * start, sy + (farY - sy) * start);
+          context.lineTo(sx + (far.x - sx) * end, sy + (farY - sy) * end);
         });
+
+        context.globalAlpha = 0.28;
+        context.lineWidth = 9 / camera.scale;
+        context.strokeStyle = withAlpha(colour, 0.22);
+        context.shadowBlur = 22 / camera.scale;
+        context.stroke();
+
+        context.globalAlpha = 0.82;
+        context.lineWidth = 2.2 / camera.scale;
+        context.strokeStyle = withAlpha(colour, 0.72);
+        context.shadowBlur = 10 / camera.scale;
+        context.stroke();
         context.restore();
       }
 
@@ -228,12 +239,12 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
         if (node.kind !== "document") return;
         const dim = activeIndex !== null && i !== activeIndex && !related.has(i);
         const lit = arrival.get(i) ?? 0;
-        const radius = Math.max(1.1, (node.radius + lit * 1.6) / camera.scale);
+        const radius = Math.max(1.1, node.radius / camera.scale);
 
         context.save();
         if (lit > 0) {
           context.shadowColor = palette[nodes[activeIndex ?? i].group];
-          context.shadowBlur = (lit * 14) / camera.scale;
+          context.shadowBlur = (lit * 24) / camera.scale;
         }
         context.fillStyle = dim && lit === 0 ? palette.ghost : related.has(i) ? palette.note : palette.noteSoft;
         context.beginPath();
@@ -252,11 +263,11 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
         const colour = palette[node.group];
         const isActive = i === activeIndex;
         const lit = arrival.get(i) ?? 0;
-        const radius = (node.radius + (isActive ? 3.4 : 0) + lit * 1.8) / camera.scale;
+        const radius = (node.radius + (isActive ? 2.4 : 0)) / camera.scale;
 
         context.save();
         context.globalAlpha = dim ? 0.4 : 1;
-        context.shadowBlur = ((isActive ? 24 : 0) + lit * 20) / camera.scale;
+        context.shadowBlur = ((isActive ? 24 : 0) + lit * 28) / camera.scale;
         context.shadowColor = colour;
         context.fillStyle = colour;
         context.beginPath();
@@ -264,13 +275,6 @@ export function ConstellationCanvas({ graph, selectedId, theme, onSelect }: Cons
         context.fill();
         context.restore();
 
-        if (isActive) {
-          context.lineWidth = 1.2 / camera.scale;
-          context.strokeStyle = withAlpha(colour, 0.5);
-          context.beginPath();
-          context.arc(node.x, node.y + wobble(i), radius + (10 + Math.sin(time * 2) * 3) / camera.scale, 0, Math.PI * 2);
-          context.stroke();
-        }
       });
 
       /* Labels, set on a soft plate so they stay legible over note clouds */

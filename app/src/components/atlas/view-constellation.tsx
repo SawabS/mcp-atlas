@@ -30,14 +30,10 @@ export function Constellation({ graph, documents, theme, onExplore, onOpen }: Co
 
   const model = useMemo(() => buildGraph(graph, documents, mode === "notes"), [documents, graph, mode]);
 
-  /*
-   * Nothing is selected on arrival, so the panel opens on the first node. The
-   * canvas is handed the same node, otherwise the panel would describe a
-   * concept that the graph shows as unlit.
-   */
   const selected = useMemo(() => {
+    if (!selectedId) return undefined;
     const nodeIndex = model.index.get(selectedId);
-    return nodeIndex === undefined ? model.nodes[0] : model.nodes[nodeIndex];
+    return nodeIndex === undefined ? undefined : model.nodes[nodeIndex];
   }, [model, selectedId]);
 
   const related = useMemo(() => {
@@ -156,7 +152,7 @@ export function Constellation({ graph, documents, theme, onExplore, onOpen }: Co
             {graph ? (
               <ConstellationCanvas
                 graph={model}
-                selectedId={selected?.id ?? ""}
+                selectedId={selectedId}
                 theme={theme}
                 onSelect={setSelectedId}
               />
@@ -172,7 +168,7 @@ export function Constellation({ graph, documents, theme, onExplore, onOpen }: Co
           </div>
 
           <aside className="pane node-panel" aria-live="polite">
-            {selected && (
+            {selected ? (
               <>
                 <span className="node-glyph" style={{ "--hue": hues[selected.group] } as CSSProperties}>
                   {selected.kind === "concept" ? <Waypoints size={19} /> : <BookOpen size={19} />}
@@ -224,6 +220,28 @@ export function Constellation({ graph, documents, theme, onExplore, onOpen }: Co
                   </button>
                 )}
               </>
+            ) : (
+              <div className="node-empty">
+                <span className="node-glyph" style={{ "--hue": "var(--iris)" } as CSSProperties}>
+                  <Waypoints size={19} />
+                </span>
+                <div>
+                  <span className="eyebrow">Whole constellation</span>
+                  <h3>Everything in view</h3>
+                </div>
+                <p>
+                  Nothing is selected yet. Hover a star to trace its connections, or click one to keep
+                  it in focus and inspect its sources.
+                </p>
+                <div className="node-overview" aria-label="Graph summary">
+                  <span>
+                    <b>{concepts}</b> concepts
+                  </span>
+                  <span>
+                    <b>{model.edges.length}</b> connections
+                  </span>
+                </div>
+              </div>
             )}
           </aside>
         </div>

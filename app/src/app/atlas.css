@@ -101,8 +101,8 @@
   background: linear-gradient(to top, var(--paper) 12%, transparent);
 }
 
-/* Theme-aware pointer aura. It is mounted only for fine pointers and users
-   who have not requested reduced motion; touch and keyboard input stay native. */
+/* Theme-aware shooting star. Fine pointers get a velocity-shaped comet trail;
+   touch, keyboard, and reduced-motion users keep the native cursor. */
 .cursor-aura-ring,
 .cursor-aura-dot {
   position: fixed;
@@ -115,59 +115,105 @@
 }
 
 .cursor-aura-ring {
-  width: 38px;
-  height: 38px;
+  --shoot-angle: -18deg;
+  --shoot-length: 28px;
+  width: 1px;
+  height: 1px;
   transition: opacity 180ms;
 }
 
-.cursor-aura-ring i {
+.cursor-aura-ring > i {
   position: absolute;
-  inset: 0;
-  border: 1px solid color-mix(in oklab, var(--iris) 58%, var(--text-3));
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in oklab, var(--iris) 8%, transparent), transparent 64%);
-  box-shadow:
-    0 0 22px -8px color-mix(in oklab, var(--iris) 80%, transparent),
-    inset 0 0 12px color-mix(in oklab, var(--aqua) 8%, transparent);
+  top: 50%;
+  right: 50%;
+  width: var(--shoot-length);
+  height: 2px;
+  border-radius: 999px 0 0 999px;
+  transform-origin: 100% 50%;
+  transform: translateY(-50%) rotate(var(--shoot-angle));
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--iris) 22%, transparent) 24%,
+    color-mix(in oklab, var(--aqua) 72%, transparent) 78%,
+    var(--text)
+  );
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--aqua) 80%, transparent));
+  opacity: 0.55;
   transition:
-    transform 360ms var(--ease-spring),
-    border-radius 280ms var(--ease-out),
-    border-color 220ms,
-    background 220ms,
-    box-shadow 280ms;
+    width 90ms linear,
+    opacity 180ms,
+    filter 180ms;
 }
 
-.cursor-aura-ring i::before,
-.cursor-aura-ring i::after {
+.cursor-aura-ring > i::before,
+.cursor-aura-ring > i::after {
   content: "";
   position: absolute;
-  inset: 7px;
-  border-radius: inherit;
-  border-top: 1px solid var(--aqua);
-  opacity: 0.65;
-  animation: cursor-spin 2.8s linear infinite;
+  pointer-events: none;
 }
 
-.cursor-aura-ring i::after {
-  inset: 12px;
-  border-top-color: var(--rose);
-  animation-direction: reverse;
-  animation-duration: 2s;
+.cursor-aura-ring > i::before {
+  right: 18%;
+  top: -3px;
+  width: 42%;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--rose) 68%, transparent));
+  transform: rotate(-3deg);
+}
+
+.cursor-aura-ring > i::after {
+  right: 44%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow:
+    -13px 3px 0 -1px var(--iris),
+    9px -4px 0 -1px var(--aqua);
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 160ms;
 }
 
 .cursor-aura-dot {
-  width: 5px;
-  height: 5px;
+  width: 24px;
+  height: 24px;
+  transition: opacity 140ms;
+}
+
+.cursor-aura-dot > i {
+  position: absolute;
+  inset: 7px;
+  background: linear-gradient(145deg, var(--text), var(--aqua) 52%, var(--iris));
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+  filter:
+    drop-shadow(0 0 3px var(--aqua))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--iris) 85%, transparent));
+  transition: transform 220ms var(--ease-spring), inset 220ms var(--ease-spring), filter 220ms;
+}
+
+.cursor-aura-dot > i::before,
+.cursor-aura-dot > i::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.cursor-aura-dot > i::before {
+  inset: -6px;
+  background:
+    linear-gradient(transparent 47%, color-mix(in oklab, var(--aqua) 50%, transparent) 49%, transparent 53%),
+    linear-gradient(90deg, transparent 47%, color-mix(in oklab, var(--iris) 52%, transparent) 49%, transparent 53%);
+  opacity: 0.72;
+}
+
+.cursor-aura-dot > i::after {
+  inset: 38%;
   border-radius: 50%;
-  background: var(--text);
-  box-shadow:
-    0 0 0 2px color-mix(in oklab, var(--iris) 28%, transparent),
-    0 0 13px var(--aqua);
-  transition:
-    width 180ms var(--ease-out),
-    height 180ms var(--ease-out),
-    opacity 140ms,
-    background 180ms;
+  background: white;
 }
 
 .cursor-aura-ring.is-visible,
@@ -175,44 +221,49 @@
   opacity: 1;
 }
 
-.cursor-aura-ring[data-mode="action"] i {
-  transform: scale(1.36);
-  border-color: color-mix(in oklab, var(--iris) 84%, var(--aqua));
-  background: radial-gradient(circle, var(--iris-soft), transparent 68%);
-  box-shadow: 0 0 30px -7px color-mix(in oklab, var(--iris) 90%, transparent);
+.cursor-aura-ring.is-moving > i {
+  opacity: 0.96;
+  filter:
+    drop-shadow(0 0 4px color-mix(in oklab, var(--aqua) 95%, transparent))
+    drop-shadow(0 0 9px color-mix(in oklab, var(--iris) 70%, transparent));
 }
 
-.cursor-aura-ring[data-mode="canvas"] i {
-  transform: scale(1.18) rotate(45deg);
-  border-radius: 11px;
-  border-color: color-mix(in oklab, var(--aqua) 78%, var(--line-2));
-  background: color-mix(in oklab, var(--aqua) 7%, transparent);
+.cursor-aura-ring.is-moving > i::after {
+  opacity: 0.72;
 }
 
-.cursor-aura-ring[data-mode="text"] i {
-  transform: scaleX(0.16) scaleY(0.72);
-  border-radius: 4px;
-  border-color: var(--aqua);
-  background: color-mix(in oklab, var(--aqua) 30%, transparent);
+.cursor-aura-ring[data-mode="action"] > i {
+  height: 3px;
+  opacity: 1;
 }
 
-.cursor-aura-ring[data-mode="text"] i::before,
-.cursor-aura-ring[data-mode="text"] i::after {
-  opacity: 0;
+.cursor-aura-dot[data-mode="action"] > i {
+  inset: 4px;
+  transform: rotate(45deg) scale(1.05);
+  filter:
+    drop-shadow(0 0 4px var(--aqua))
+    drop-shadow(0 0 11px var(--iris));
 }
 
-.cursor-aura-dot[data-mode="action"] {
-  width: 7px;
-  height: 7px;
-  background: var(--aqua);
+.cursor-aura-dot[data-mode="canvas"] > i {
+  background: linear-gradient(145deg, var(--text), var(--iris) 46%, var(--rose));
 }
 
-.cursor-aura-ring.is-down i {
-  transform: scale(0.78);
+.cursor-aura-dot[data-mode="text"] > i {
+  inset: 8px 6px;
+  opacity: 0.8;
 }
 
-html[data-cursor="aurora"],
-html[data-cursor="aurora"] * {
+.cursor-aura-dot.is-down > i {
+  transform: rotate(45deg) scale(0.68);
+}
+
+.cursor-aura-ring.is-down > i {
+  opacity: 0.38;
+}
+
+html[data-cursor="shooting-star"],
+html[data-cursor="shooting-star"] * {
   cursor: none !important;
 }
 
@@ -1606,6 +1657,43 @@ kbd {
   font-size: 13.5px;
   line-height: 1.62;
   color: var(--text-2);
+}
+
+.node-empty {
+  min-height: 100%;
+  justify-content: center;
+}
+
+.node-empty > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.node-overview {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px !important;
+  margin-top: 4px;
+}
+
+.node-overview span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--glass);
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.node-overview b {
+  font-family: var(--font-serif-stack);
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--text);
 }
 
 .node-glyph {
@@ -3049,12 +3137,6 @@ kbd {
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes cursor-spin {
   to {
     transform: rotate(360deg);
   }
