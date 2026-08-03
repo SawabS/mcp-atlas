@@ -1,19 +1,44 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
-import { Ask } from "@/components/mcp-index/ask";
-import { Constellation } from "@/components/mcp-index/view-constellation";
+import dynamic from "next/dynamic";
+import { LoaderCircle, Sparkles } from "lucide-react";
 import { CursorAura } from "@/components/mcp-index/cursor-aura";
-import { Library } from "@/components/mcp-index/view-library";
 import { Overview } from "@/components/mcp-index/view-overview";
-import { Reader } from "@/components/mcp-index/reader";
-import { Registry } from "@/components/mcp-index/view-registry";
 import { Rail, type IndexView } from "@/components/mcp-index/rail";
 import { Sky } from "@/components/mcp-index/sky";
-import { Spotlight } from "@/components/mcp-index/spotlight";
 import { loadDocuments, loadGraph, loadStats } from "@/lib/client-data";
 import type { CorpusStats, GraphData, KnowledgeDocumentSummary } from "@/lib/knowledge-types";
+
+/*
+ * Every view but Overview, plus the Ask panel (markdown + math + mermaid +
+ * code-highlighting) and the command palette, is code-split so a first-time
+ * visitor's initial bundle is just the Overview. Each chunk fetches the
+ * moment its view is navigated to, or the first time Ask/Spotlight opens.
+ */
+const viewLoading = () => (
+  <div className="loading">
+    <LoaderCircle size={22} className="spin" />
+  </div>
+);
+
+const Library = dynamic(() => import("@/components/mcp-index/view-library").then((m) => m.Library), {
+  loading: viewLoading,
+});
+const Constellation = dynamic(
+  () => import("@/components/mcp-index/view-constellation").then((m) => m.Constellation),
+  { loading: viewLoading },
+);
+const Registry = dynamic(() => import("@/components/mcp-index/view-registry").then((m) => m.Registry), {
+  loading: viewLoading,
+});
+const Reader = dynamic(() => import("@/components/mcp-index/reader").then((m) => m.Reader), {
+  loading: viewLoading,
+});
+const Ask = dynamic(() => import("@/components/mcp-index/ask").then((m) => m.Ask), {
+  loading: viewLoading,
+});
+const Spotlight = dynamic(() => import("@/components/mcp-index/spotlight").then((m) => m.Spotlight));
 
 type Seed = { id: number; text: string };
 
@@ -25,7 +50,9 @@ export function McpIndex({ readyModels }: { readyModels: string[] }) {
 
   const [openDocument, setOpenDocument] = useState<string | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const [spotlightMounted, setSpotlightMounted] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
+  const [askMounted, setAskMounted] = useState(false);
   const [seed, setSeed] = useState<Seed | null>(null);
 
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -65,6 +92,7 @@ export function McpIndex({ readyModels }: { readyModels: string[] }) {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
+        setSpotlightMounted(true);
         setSpotlightOpen((open) => !open);
         return;
       }
@@ -112,7 +140,13 @@ export function McpIndex({ readyModels }: { readyModels: string[] }) {
       setSeed({ id: seedId.current, text: question });
       setOpenDocument(null);
     }
+    setAskMounted(true);
     setAskOpen(true);
+  }, []);
+
+  const openSpotlight = useCallback(() => {
+    setSpotlightMounted(true);
+    setSpotlightOpen(true);
   }, []);
 
   const toggleTheme = useCallback(() => {
@@ -133,7 +167,7 @@ export function McpIndex({ readyModels }: { readyModels: string[] }) {
           view={view}
           theme={theme}
           onNavigate={navigate}
-          onSearch={() => setSpotlightOpen(true)}
+          onSearch={openSpotlight}
           onToggleTheme={toggleTheme}
           onAsk={() => ask()}
         />
@@ -192,25 +226,29 @@ export function McpIndex({ readyModels }: { readyModels: string[] }) {
         </button>
       )}
 
-      <Ask
-        open={askOpen}
-        seed={seed}
-        readyModels={readyModels}
-        onClose={() => setAskOpen(false)}
-        onSeedUsed={() => setSeed(null)}
-      />
+      {askMounted && (
+        <Ask
+          open={askOpen}
+          seed={seed}
+          readyModels={readyModels}
+          onClose={() => setAskOpen(false)}
+          onSeedUsed={() => setSeed(null)}
+        />
+      )}
 
-      <Spotlight
-        key={spotlightOpen ? "spotlight-open" : "spotlight-closed"}
-        open={spotlightOpen}
-        documents={documents}
-        onClose={() => setSpotlightOpen(false)}
-        onOpen={(id) => {
-          setSpotlightOpen(false);
-          setOpenDocument(id);
-        }}
-        onSearchAll={search}
-      />
+      {spotlightMounted && (
+        <Spotlight
+          key={spotlightOpen ? "spotlight-open" : "spotlight-closed"}
+          open={spotlightOpen}
+          documents={documents}
+          onClose={() => setSpotlightOpen(false)}
+          onOpen={(id) => {
+            setSpotlightOpen(false);
+            setOpenDocument(id);
+          }}
+          onSearchAll={search}
+        />
+      )}
 
       {openDocument && (
         <Reader
