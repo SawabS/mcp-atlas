@@ -1,5 +1,5 @@
-import { KnowledgeAtlas } from "@/components/atlas/knowledge-atlas";
+import { Atlas } from "@/components/atlas/atlas";
 
 export default function Home() {
-  return <KnowledgeAtlas />;
+  return <Atlas />;
 }

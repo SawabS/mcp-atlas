@@ -63,32 +63,29 @@ Large data is loaded only when its view needs it. The Registry catalogue is not 
 
 The graph view has two scopes. Concepts presents the 16 curated protocol concepts and their direct relationships. All notes adds every generated source note, producing 1,130 nodes and 3,011 links in the current corpus.
 
-Sigma.js renders the network with WebGL. Graphology owns the graph structure, indexed adjacency, and node attributes. ForceAtlas2 runs in a web worker so layout work does not block interface input. The Sigma bundle is loaded only after the graph view is opened because it requires browser APIs and is not needed by the home, library, or Registry views.
+A purpose-built HTML canvas renderer draws the network. A deterministic constellation layout places concept clusters on a wide ring and settles each source note into a phyllotaxis halo around the concept it explains, so the same corpus always produces the same map and no layout worker is needed. The renderer keeps its own camera, adjacency index, and label collision pass, and animates at display refresh rate for the full 1,130-node scope.
 
 ```mermaid
 flowchart LR
     concepts[Curated concept graph]
     notes[Generated source notes]
     adapter[Graph data adapter]
-    graphology[Graphology graph and adjacency index]
-    worker[ForceAtlas2 worker]
-    sigma[Sigma.js WebGL renderer]
-    interaction[Pan, zoom, search, select, and drag]
+    model[Constellation layout and adjacency index]
+    renderer[Canvas renderer with animated camera]
+    interaction[Pan, zoom, search, and select]
     destinations[Reader, library, and grounded chat]
 
     concepts --> adapter
     notes --> adapter
-    adapter --> graphology
-    graphology --> worker
-    worker --> graphology
-    graphology --> sigma
-    sigma --> interaction
+    adapter --> model
+    model --> renderer
+    renderer --> interaction
     interaction --> destinations
 ```
 
 Selecting a concept highlights its immediate neighborhood and exposes connected concepts or notes. Selecting a note can open the corresponding source reader directly. Search uses deferred input and map lookups so it remains responsive in the full corpus view.
 
-The interface supports dark and light themes, responsive desktop and mobile layouts, a home-linked brand mark, and a chat panel that can be resized and moved between the left and right sides.
+The interface supports dark and light themes, responsive desktop and mobile layouts, a home-linked brand mark, and a grounded chat drawer that can be resized on the desktop and becomes a sheet on small screens.
 
 ### Retrieval and chat layer
 

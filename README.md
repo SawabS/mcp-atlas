@@ -13,8 +13,8 @@ Everything for the project lives inside this `mcp-knowledge/` directory.
 - 16 connected protocol concepts, with a full 1,130-node note graph
 - Commit-pinned GitHub links for official source citations
 - A generated Obsidian vault with maps, concepts, Canvas, and Bases
-- A responsive Next.js web app with search, reader, WebGL graph, Registry, and chat views
-- Dark and light themes, mobile navigation, and a resizable chat panel that docks on either side
+- A responsive Next.js web app with search, reader, constellation graph, Registry, and chat views
+- Dark and light themes, mobile navigation, and a resizable grounded chat drawer
 
 Current counts are generated in `app/public/data/stats.json` and may change after a corpus refresh.
 
