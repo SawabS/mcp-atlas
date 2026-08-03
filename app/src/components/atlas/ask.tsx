@@ -129,6 +129,9 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
   const liveHasText = Boolean(
     liveMessage?.parts.some((part) => part.type === "text" && part.text.trim()),
   );
+  const showRetrievalProgress = busy
+    && !liveHasText
+    && liveProgress?.phase !== "drafting";
 
   useEffect(() => {
     if (!open) return;
@@ -374,9 +377,8 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
               );
             })}
 
-            {busy && (
+            {showRetrievalProgress && (
               <ChatProgress
-                hasText={liveHasText}
                 onStop={stop}
                 progress={liveProgress}
                 sourceCount={liveSources.length}

@@ -157,7 +157,7 @@
     animation: none !important;
   }
 
-  .chat-progress-orbit i,
+  .chat-progress-orbit-track,
   .chat-progress-step[data-state="active"] > span {
     animation: none !important;
   }
@@ -2893,39 +2893,59 @@ kbd {
 
 .chat-progress-orbit {
   position: relative;
+  display: grid;
+  place-items: center;
   flex: none;
   width: 34px;
   height: 34px;
   border: 1px solid color-mix(in oklab, var(--iris) 28%, transparent);
   border-radius: 50%;
-  background: radial-gradient(circle, var(--iris-soft), transparent 68%);
+  background: radial-gradient(circle, var(--iris-soft) 0 18%, transparent 62%);
+  box-shadow: inset 0 0 11px color-mix(in oklab, var(--iris) 8%, transparent);
 }
 
-.chat-progress-orbit i {
+.chat-progress-orbit::after {
+  content: "";
   position: absolute;
-  display: block;
+  inset: 6px;
+  border: 1px solid color-mix(in oklab, var(--iris) 19%, transparent);
   border-radius: 50%;
 }
 
-.chat-progress-orbit i:first-child {
-  inset: 12px;
-  background: color-mix(in oklab, white 34%, var(--iris));
-  box-shadow: 0 0 10px var(--iris);
-  animation: progress-core 1.8s var(--ease-glide) infinite alternate;
+.chat-progress-orbit-track {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 22px;
+  height: 22px;
+  animation: progress-orbit-shared 3.4s infinite;
 }
 
-.chat-progress-orbit i:not(:first-child) {
-  top: 15px;
-  left: 15px;
+.chat-progress-orbit-track i {
+  --dot-angle: 0deg;
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  display: block;
   width: 4px;
   height: 4px;
-  background: var(--aqua);
+  border-radius: 50%;
+  background: color-mix(in oklab, white 18%, var(--aqua));
   box-shadow: 0 0 7px var(--aqua);
-  animation: progress-orbit 2.6s linear infinite;
+  transform: rotate(var(--dot-angle)) translateY(-10px);
 }
 
-.chat-progress-orbit i:nth-child(3) { animation-delay: -0.86s; }
-.chat-progress-orbit i:nth-child(4) { animation-delay: -1.72s; }
+.chat-progress-orbit-track i:nth-child(2) {
+  --dot-angle: 120deg;
+  background: color-mix(in oklab, white 12%, var(--iris));
+  box-shadow: 0 0 7px var(--iris);
+}
+
+.chat-progress-orbit-track i:nth-child(3) {
+  --dot-angle: 240deg;
+  background: color-mix(in oklab, white 15%, var(--rose));
+  box-shadow: 0 0 7px var(--rose);
+}
 
 .chat-progress-toggle {
   display: flex;
@@ -3035,8 +3055,30 @@ kbd {
 }
 
 .chat-progress-step strong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   font-size: 11.5px;
   font-weight: 500;
+}
+
+.chat-progress-step strong em {
+  flex: none;
+  color: var(--text-3);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chat-progress-step[data-state="active"] strong em {
+  color: var(--iris);
+}
+
+.chat-progress-step[data-state="complete"] strong em {
+  color: var(--aqua);
 }
 
 .chat-progress-step small {
@@ -3063,12 +3105,20 @@ kbd {
   animation: progress-step 1.5s var(--ease-glide) infinite alternate;
 }
 
-@keyframes progress-core {
-  to { transform: scale(1.35); opacity: 0.7; }
-}
-
-@keyframes progress-orbit {
-  to { transform: rotate(1turn) translateX(12px) rotate(-1turn); }
+@keyframes progress-orbit-shared {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.53);
+  }
+  38% {
+    transform: rotate(105deg);
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  74% {
+    transform: rotate(300deg);
+    animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+  }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes progress-step {

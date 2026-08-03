@@ -6,7 +6,6 @@ import type { ChatStatus } from "ai";
 import type { AtlasProgress } from "@/lib/knowledge-types";
 
 type ChatProgressProps = {
-  hasText: boolean;
   progress?: AtlasProgress;
   sourceCount: number;
   status: ChatStatus;
@@ -15,7 +14,7 @@ type ChatProgressProps = {
 
 const phaseOrder = { retrieving: 0, ranking: 1, drafting: 2 } as const;
 
-export function ChatProgress({ hasText, progress, sourceCount, status, onStop }: ChatProgressProps) {
+export function ChatProgress({ progress, sourceCount, status, onStop }: ChatProgressProps) {
   const [expanded, setExpanded] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const startedAt = useRef(0);
@@ -32,18 +31,15 @@ export function ChatProgress({ hasText, progress, sourceCount, status, onStop }:
   }, []);
 
   const label = phase === "retrieving"
-    ? "Searching the local knowledge index"
+    ? "Searching official MCP sources"
     : phase === "ranking"
-      ? `Reviewing ${count || "the"} closest official passages`
-      : hasText
-        ? "Streaming a source-linked answer"
-        : `Composing from ${count || "retrieved"} sources`;
+      ? `Selecting the best ${count || "retrieved"} passages`
+      : "Preparing the grounded answer";
 
   const steps = [
-    { phase: -1, label: "Question received", detail: "The request stays inside this conversation." },
-    { phase: 0, label: "Retrieve passages", detail: "Search the server-side BM25F index." },
-    { phase: 1, label: "Rank evidence", detail: count ? `Selected ${count} passages with source diversity.` : "Prefer current and authoritative sources." },
-    { phase: 2, label: "Draft with citations", detail: "Stream claims with exact S1, S2 source links." },
+    { phase: -1, label: "Request accepted", detail: "Your question is ready for retrieval." },
+    { phase: 0, label: "Search the official corpus", detail: "Find relevant passages in the local BM25F index." },
+    { phase: 1, label: "Select the evidence", detail: count ? `Keep the ${count} strongest, source-diverse passages.` : "Prefer current, authoritative sources." },
   ];
   const current = phaseOrder[phase];
 
@@ -52,7 +48,9 @@ export function ChatProgress({ hasText, progress, sourceCount, status, onStop }:
       <span className="sr-only" aria-live="polite">{label}</span>
       <div className="chat-progress-head">
         <span className="chat-progress-orbit" aria-hidden="true">
-          <i /><i /><i /><i />
+          <span className="chat-progress-orbit-track">
+            <i /><i /><i />
+          </span>
         </span>
         <button
           aria-controls={detailsId}
@@ -76,11 +74,12 @@ export function ChatProgress({ hasText, progress, sourceCount, status, onStop }:
       <div className="chat-progress-steps" hidden={!expanded} id={detailsId}>
         {steps.map((step) => {
           const state = step.phase < current ? "complete" : step.phase === current ? "active" : "pending";
+          const stateLabel = state === "complete" ? "Done" : state === "active" ? "In progress" : "Waiting";
           return (
             <div className="chat-progress-step" data-state={state} key={step.label}>
               <span aria-hidden="true" />
               <div>
-                <strong>{step.label}</strong>
+                <strong>{step.label}<em>{stateLabel}</em></strong>
                 <small>{step.detail}</small>
               </div>
             </div>
