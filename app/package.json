@@ -10,7 +10,8 @@
     "build:pages": "cross-env STATIC_EXPORT=true next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "eval:retrieval": "node --no-warnings scripts/evaluate-retrieval.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",

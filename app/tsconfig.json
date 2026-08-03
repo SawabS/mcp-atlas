@@ -30,5 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "//": "scripts/ runs directly on Node with native type stripping, using runtime APIs newer than the installed @types/node. It is not part of the Next build.",
+  "exclude": ["node_modules", "scripts"]
 }

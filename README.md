@@ -86,6 +86,18 @@ npm run build:pages
 npm audit
 ```
 
+### Retrieval quality
+
+Grounded answers are only as good as what is retrieved for them, so the ranker
+has its own evaluation over a fixed set of questions.
+
+```bash
+cd app
+npm run eval:retrieval              # hit@1, hit@3 and hit@8
+npm run eval:retrieval -- --detail  # the top result for each question
+npm run eval:retrieval -- --sweep   # grid search the ranking weights
+```
+
 ## Hosting
 
 For the complete application, including the private model key and `/api/chat`, deploy `app/` to a Node.js or Vercel environment and configure `NVIDIA_NEMOTRON_API_KEY`.
@@ -97,5 +109,7 @@ Detailed data flow, security boundaries, and publishing options are in [docs/ARC
 ## Source policy
 
 Retrieval favors the current specification, then official core documentation, SDK documentation and examples, reference servers, official tooling, and finally active Registry metadata. Repeated text is deduplicated by normalized content hash.
+
+How a question becomes a cited answer, from corpus build through BM25F ranking to the citation links, is documented in [docs/RETRIEVAL.md](docs/RETRIEVAL.md).
 
 Registry records are treated as untrusted metadata. Deleted Registry records remain only in audit snapshots and do not enter the default catalogue or retrieval index.

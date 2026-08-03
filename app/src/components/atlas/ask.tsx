@@ -54,12 +54,42 @@ function readableError(message: string) {
   }
 }
 
+/** Every [S…] label the answer actually used, once the invented ones are gone. */
+function citedIds(text: string, known: Set<string>): Set<string> {
+  const found = new Set<string>();
+  for (const match of text.matchAll(/\[(S\d+)]/gi)) {
+    const id = match[1].toUpperCase();
+    if (known.has(id)) found.add(id);
+  }
+  return found;
+}
+
+/**
+ * Turns citation markers into links to the exact passage.
+ *
+ * Models occasionally cite a label that was never supplied, or staple the whole
+ * list onto one sentence. Unknown labels are dropped rather than left as literal
+ * text, and a run of markers is de-duplicated so it reads as a reference list.
+ */
 function linkCitations(text: string, sources: Array<{ sourceId: string; url: string }>) {
-  const urls = new Map(sources.map((source) => [source.sourceId, source.url]));
-  return text.replace(/\[(S\d+)](?!\()/g, (marker, sourceId: string) => {
-    const url = urls.get(sourceId);
-    return url ? `[${sourceId}](${url})` : marker;
-  });
+  const urls = new Map(sources.map((source) => [source.sourceId.toUpperCase(), source.url]));
+  return (
+    text
+      // "[S1, S2]" and "[S1; S2]" mean the same as "[S1][S2]".
+      .replace(/\[(S\d+(?:\s*[,;]\s*S\d+)+)]/gi, (_match, group: string) =>
+        group
+          .split(/\s*[,;]\s*/)
+          .map((id) => `[${id.trim().toUpperCase()}]`)
+          .join(""),
+      )
+      .replace(/(?:\[S\d+](?!\())+/gi, (run) => {
+        const ids = [...new Set((run.match(/S\d+/gi) ?? []).map((id) => id.toUpperCase()))];
+        return ids
+          .filter((id) => urls.has(id))
+          .map((id) => `[${id}](${urls.get(id)})`)
+          .join("");
+      })
+  );
 }
 
 type AskProps = {
@@ -211,6 +241,8 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
               const texts = message.parts.filter((part) => part.type === "text");
               const streaming = busy && position === messages.length - 1 && message.role === "assistant";
               const plain = texts.map((part) => part.text).join("\n");
+              const known = new Set(sources.map((source) => source.sourceId.toUpperCase()));
+              const used = citedIds(plain, known);
 
               return (
                 <div className={`turn ${message.role === "user" ? "is-user" : ""}`} key={message.id}>
@@ -252,12 +284,25 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
                     <Sources>
                       <SourcesTrigger className="sources-toggle" count={sources.length} />
                       <SourcesContent className="flex w-full flex-col gap-1.5">
+                        {/*
+                         * All retrieved passages are listed, with the ones the
+                         * answer actually leaned on marked, so it stays obvious
+                         * what was read versus what was used.
+                         */}
                         {sources.map((source) => {
                           const title = displayText(source.title ?? source.sourceId);
+                          const cited = used.has(source.sourceId.toUpperCase());
                           return (
-                            <Source className="source-link" key={source.sourceId} href={source.url} title={title}>
+                            <Source
+                              className="source-link"
+                              data-cited={cited}
+                              key={source.sourceId}
+                              href={source.url}
+                              title={cited ? `Cited in this answer: ${title}` : title}
+                            >
                               <span className="source-num">{source.sourceId}</span>
                               <span>{title}</span>
+                              {cited && <span className="source-tag">cited</span>}
                               <ExternalLink size={12} />
                             </Source>
                           );

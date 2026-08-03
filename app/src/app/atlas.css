@@ -2718,6 +2718,32 @@ kbd {
   color: var(--text);
 }
 
+/* A passage the answer actually cited, as opposed to one merely retrieved. */
+.source-link[data-cited="true"] {
+  border-color: color-mix(in oklab, var(--iris) 34%, var(--line));
+  background: color-mix(in oklab, var(--iris) 7%, var(--glass));
+  color: var(--text);
+}
+
+.source-link > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-tag {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--iris-soft);
+  color: var(--iris);
+  font-size: 10px;
+  font-weight: 520;
+  letter-spacing: 0.03em;
+}
+
 .source-num {
   display: grid;
   place-items: center;
