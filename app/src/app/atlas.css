@@ -114,173 +114,22 @@
   background: linear-gradient(to top, var(--paper) 12%, transparent);
 }
 
-/* Theme-aware shooting star. Fine pointers get a velocity-shaped comet trail;
-   touch, keyboard, and reduced-motion users keep the native cursor. */
-.cursor-aura-ring,
-.cursor-aura-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  pointer-events: none;
-  opacity: 0;
-  will-change: transform;
-}
-
-.cursor-aura-ring {
-  --shoot-angle: -18deg;
-  --shoot-length: 28px;
-  width: 1px;
-  height: 1px;
-  transition: opacity 180ms;
-}
-
-.cursor-aura-ring > i {
-  position: absolute;
-  top: 50%;
-  right: 50%;
-  width: var(--shoot-length);
-  height: 8px;
-  transform-origin: 100% 50%;
-  transform: translateY(-50%) rotate(var(--shoot-angle));
-  clip-path: polygon(0 50%, 100% 0, 100% 100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklab, var(--iris) 15%, transparent) 22%,
-    color-mix(in oklab, var(--aqua) 32%, transparent) 58%,
-    color-mix(in oklab, white 88%, var(--aqua))
-  );
-  filter: blur(0.3px) drop-shadow(0 0 5px color-mix(in oklab, var(--aqua) 72%, transparent));
-  opacity: 0.42;
-  transition:
-    width 90ms linear,
-    opacity 180ms,
-    filter 180ms;
-}
-
-.cursor-aura-ring > i::before,
-.cursor-aura-ring > i::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-
-.cursor-aura-ring > i::before {
-  inset: -4px 0;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent 15%, color-mix(in oklab, var(--iris) 22%, transparent), color-mix(in oklab, var(--aqua) 55%, transparent));
-  filter: blur(6px);
-}
-
-.cursor-aura-ring > i::after {
-  right: 32%;
-  top: 50%;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: white;
+/* Motion+ Cursor supplies pointer tracking, press states, text sizing, and
+   reduced-motion handling. Only the visual skin belongs to Atlas. */
+[data-motion-cursor].atlas-motion-cursor {
+  border: 1px solid color-mix(in oklab, white 72%, var(--aqua));
+  background: radial-gradient(circle at 35% 30%, white 0 10%, var(--aqua) 32%, var(--iris) 78%);
   box-shadow:
-    -12px 4px 0 -0.5px var(--iris),
-    10px -4px 0 -0.5px var(--aqua),
-    -29px -2px 0 -0.75px var(--rose);
-  opacity: 0;
-  transform: translateY(-50%);
-  transition: opacity 120ms;
+    0 0 8px color-mix(in oklab, var(--aqua) 78%, transparent),
+    0 0 18px color-mix(in oklab, var(--iris) 48%, transparent);
 }
 
-.cursor-aura-dot {
-  width: 22px;
-  height: 22px;
-  transition: opacity 140ms;
-}
-
-.cursor-aura-dot > i {
-  position: absolute;
-  inset: 6px;
-  border: 1px solid color-mix(in oklab, white 74%, var(--aqua));
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 34%, white 0 16%, var(--aqua) 32%, var(--iris) 72%, transparent 76%);
+[data-motion-cursor="pointer"].atlas-motion-cursor {
+  background: color-mix(in oklab, var(--iris) 34%, transparent);
+  border-color: color-mix(in oklab, var(--aqua) 72%, white);
   box-shadow:
-    0 0 5px color-mix(in oklab, var(--aqua) 88%, transparent),
-    0 0 11px color-mix(in oklab, var(--iris) 70%, transparent);
-  transition: transform 180ms var(--ease-spring), inset 180ms var(--ease-spring), box-shadow 180ms;
-}
-
-.cursor-aura-dot > i::before,
-.cursor-aura-dot > i::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-
-.cursor-aura-dot > i::before {
-  inset: -5px;
-  border-radius: 50%;
-  border: 1px solid color-mix(in oklab, var(--aqua) 16%, transparent);
-  filter: blur(1px);
-  opacity: 0.65;
-}
-
-.cursor-aura-dot > i::after {
-  inset: 29%;
-  border-radius: 50%;
-  background: white;
-}
-
-.cursor-aura-ring.is-visible,
-.cursor-aura-dot.is-visible {
-  opacity: 1;
-}
-
-.cursor-aura-ring.is-moving > i {
-  opacity: 0.88;
-  filter:
-    drop-shadow(0 0 4px color-mix(in oklab, var(--aqua) 95%, transparent))
-    drop-shadow(0 0 9px color-mix(in oklab, var(--iris) 70%, transparent));
-}
-
-.cursor-aura-ring.is-moving > i::after {
-  opacity: 0.9;
-  animation: cursor-glitter 460ms steps(2, end) infinite alternate;
-}
-
-.cursor-aura-ring[data-mode="action"] > i {
-  opacity: 0.9;
-}
-
-.cursor-aura-dot[data-mode="action"] > i {
-  inset: 4px;
-  box-shadow: 0 0 7px var(--aqua), 0 0 14px var(--iris);
-}
-
-.cursor-aura-dot[data-mode="canvas"] > i {
-  background: radial-gradient(circle at 38% 34%, white 0 16%, var(--iris) 34%, var(--rose) 72%, transparent 76%);
-}
-
-.cursor-aura-dot[data-mode="text"] > i {
-  inset: 7px;
-  opacity: 0.8;
-}
-
-.cursor-aura-dot.is-down > i {
-  transform: scale(0.68);
-}
-
-.cursor-aura-ring.is-down > i {
-  opacity: 0.38;
-}
-
-html[data-cursor="shooting-star"],
-html[data-cursor="shooting-star"] * {
-  cursor: none !important;
-}
-
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .cursor-aura-ring,
-  .cursor-aura-dot {
-    display: none !important;
-  }
+    0 0 12px color-mix(in oklab, var(--aqua) 54%, transparent),
+    inset 0 0 12px color-mix(in oklab, var(--iris) 34%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
