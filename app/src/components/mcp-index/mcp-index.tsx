@@ -35,10 +35,18 @@ const Registry = dynamic(() => import("@/components/mcp-index/view-registry").th
 const Reader = dynamic(() => import("@/components/mcp-index/reader").then((m) => m.Reader), {
   loading: viewLoading,
 });
-const Ask = dynamic(() => import("@/components/mcp-index/ask").then((m) => m.Ask), {
-  loading: viewLoading,
-});
-const Spotlight = dynamic(() => import("@/components/mcp-index/spotlight").then((m) => m.Spotlight));
+/*
+ * Ask and Spotlight reveal with a CSS mount animation (slide-in panel,
+ * command palette), so unlike the views above they get no loading
+ * fallback — popping in mid-animation read as broken. Instead their
+ * chunks are prefetched at idle right after first paint (see the effect
+ * below), so by the time someone actually clicks "Ask Index" or hits
+ * ⌘K the import is already cached and the reveal is instant again.
+ */
+const importAsk = () => import("@/components/mcp-index/ask");
+const importSpotlight = () => import("@/components/mcp-index/spotlight");
+const Ask = dynamic(() => importAsk().then((m) => m.Ask));
+const Spotlight = dynamic(() => importSpotlight().then((m) => m.Spotlight));
 
 type Seed = { id: number; text: string };
 
@@ -73,6 +81,19 @@ export function McpIndex({ readyModels }: { readyModels: string[] }) {
     return () => {
       live = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const warm = () => {
+      importAsk();
+      importSpotlight();
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const handle = window.requestIdleCallback(warm);
+      return () => window.cancelIdleCallback(handle);
+    }
+    const timer = window.setTimeout(warm, 200);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {

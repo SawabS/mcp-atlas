@@ -2226,6 +2226,38 @@ kbd {
   background: transparent !important;
 }
 
+/* Same principle as code blocks: streamdown owns the table chrome too, keep one shell, not nested cards. */
+.prose [data-streamdown="table-wrapper"],
+.answer [data-streamdown="table-wrapper"] {
+  gap: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-sm) !important;
+  background: color-mix(in oklab, var(--paper) 72%, transparent) !important;
+}
+
+/* The actions row (copy/download/fullscreen) is the wrapper's other direct
+   child, distinguished only by not containing the table itself. */
+.prose [data-streamdown="table-wrapper"] > div:not(:has(table)),
+.answer [data-streamdown="table-wrapper"] > div:not(:has(table)) {
+  height: 42px;
+  padding-inline: 12px;
+  gap: 2px !important;
+}
+
+.prose [data-streamdown="table-wrapper"] > div:has(table),
+.answer [data-streamdown="table-wrapper"] > div:has(table) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.prose [data-streamdown="table-wrapper"] > div:not(:has(table)) + div:has(table),
+.answer [data-streamdown="table-wrapper"] > div:not(:has(table)) + div:has(table) {
+  border-top: 1px solid var(--line) !important;
+}
+
 [data-code-action] {
   display: inline-flex;
   width: 28px;
