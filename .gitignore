@@ -17,3 +17,9 @@ __pycache__/
 .env*
 .reference/
 app/artifacts/
+
+# Playwright CLI session artifacts and test run output.
+.playwright-cli/
+app/test-results/
+app/playwright-report/
+app/out/
