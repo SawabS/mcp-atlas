@@ -102,7 +102,7 @@ export function Reader({ documentId, onClose, onAsk, onConcept }: ReaderProps) {
           </div>
         ) : (
           <div className="sheet-body" onScroll={onScroll}>
-            <main>
+            <div>
               <div className="doc-head">
                 <span className="badge" data-kind={document.authority.replace("official-", "")}>
                   <i />
@@ -132,7 +132,7 @@ export function Reader({ documentId, onClose, onAsk, onConcept }: ReaderProps) {
                   {document.content}
                 </MessageResponse>
               </div>
-            </main>
+            </div>
 
             <aside className="meta-rail" aria-label="Source details">
               <div className="meta-block">

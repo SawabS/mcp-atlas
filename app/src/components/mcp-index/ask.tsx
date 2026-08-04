@@ -164,6 +164,12 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
     setInput("");
   };
 
+  const clearConversation = () => {
+    if (busy) stop();
+    setMessages([]);
+    setCopied(null);
+  };
+
   const copy = (id: string, text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(id);
@@ -234,7 +240,7 @@ export function Ask({ open, seed, readyModels, onClose, onSeedUsed }: AskProps) 
             </SelectContent>
           </Select>
           {messages.length > 0 && (
-            <button className="icon-btn" type="button" onClick={() => setMessages([])} aria-label="Clear conversation">
+            <button className="icon-btn" type="button" onClick={clearConversation} aria-label="Clear conversation">
               <RotateCcw size={16} />
             </button>
           )}

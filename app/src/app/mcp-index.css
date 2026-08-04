@@ -2417,6 +2417,71 @@ kbd {
   font-weight: 560;
 }
 
+/* Streamdown's table actions and grid belong to one surface, not nested cards. */
+.prose [data-streamdown="table-wrapper"] {
+  gap: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-sm) !important;
+  background: color-mix(in oklab, var(--paper) 72%, transparent) !important;
+}
+
+.prose [data-streamdown="table-wrapper"] > div:first-child {
+  min-height: 42px;
+  padding-inline: 10px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--muted) 42%, transparent);
+}
+
+.prose [data-streamdown="table-wrapper"] > div:first-child button {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  padding: 0 !important;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+}
+
+.prose [data-streamdown="table-wrapper"] > div:first-child button:hover:not(:disabled) {
+  background: var(--muted);
+  color: var(--text);
+}
+
+.prose [data-streamdown="table-wrapper"] > div:nth-child(2) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.prose [data-streamdown="table"] {
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.prose [data-streamdown="table-header-cell"],
+.prose [data-streamdown="table-cell"] {
+  border: 0 !important;
+  background: transparent;
+}
+
+.prose [data-streamdown="table-header-cell"] {
+  border-bottom: 1px solid var(--line) !important;
+  background: color-mix(in oklab, var(--muted) 72%, transparent);
+}
+
+.prose [data-streamdown="table-header-cell"]:not(:last-child),
+.prose [data-streamdown="table-cell"]:not(:last-child) {
+  border-right: 1px solid var(--line) !important;
+}
+
+.prose [data-streamdown="table-body"] > [data-streamdown="table-row"]:not(:last-child) > [data-streamdown="table-cell"] {
+  border-bottom: 1px solid var(--line) !important;
+}
+
 /* ---------- 11 · Spotlight ------------------------------- */
 
 .spotlight-scrim {
