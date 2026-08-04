@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ArrowUpRight, Layers, Search, SearchX } from "lucide-react";
+import GlareHover from "@/components/GlareHover";
 import { Reveal } from "@/components/mcp-index/motion";
 import type { KnowledgeDocumentSummary } from "@/lib/knowledge-types";
 
@@ -119,32 +120,45 @@ export function Library({ documents, query, category, onQuery, onCategory, onOpe
             <div className="card-grid">
               {results.slice(0, limit).map((document, index) => (
                 <Reveal key={document.id} delay={Math.min(index, 11) * 34}>
-                  <button
-                    type="button"
-                    className="card doc-card"
-                    onClick={() => onOpen(document.id)}
+                  <GlareHover
+                    className="doc-card-glare"
+                    width="100%"
+                    height="100%"
+                    background="transparent"
+                    borderRadius="var(--r-md)"
+                    borderColor="transparent"
+                    glareColor="#ffffff"
+                    glareOpacity={0.1}
+                    glareSize={180}
+                    transitionDuration={620}
                   >
-                    <div className="doc-card-top">
-                      <span className="badge" data-kind={document.authority.replace("official-", "")}>
-                        <i />
-                        {document.authority.replace("official-", "")}
-                      </span>
-                      <ArrowUpRight size={16} color="var(--text-3)" />
-                    </div>
-                    <h3>{document.title}</h3>
-                    <p>{document.excerpt}</p>
-                    <div className="tag-row">
-                      {document.concepts.slice(0, 3).map((concept) => (
-                        <span className="tag" key={concept}>
-                          {concept}
+                    <button
+                      type="button"
+                      className="card doc-card"
+                      onClick={() => onOpen(document.id)}
+                    >
+                      <div className="doc-card-top">
+                        <span className="badge" data-kind={document.authority.replace("official-", "")}>
+                          <i />
+                          {document.authority.replace("official-", "")}
                         </span>
-                      ))}
-                    </div>
-                    <footer>
-                      <span>{document.repository.replace("modelcontextprotocol/", "")}</span>
-                      <span>{document.wordCount.toLocaleString("en-US")} words</span>
-                    </footer>
-                  </button>
+                        <ArrowUpRight size={16} color="var(--text-3)" />
+                      </div>
+                      <h3>{document.title}</h3>
+                      <p>{document.excerpt}</p>
+                      <div className="tag-row">
+                        {document.concepts.slice(0, 3).map((concept) => (
+                          <span className="tag" key={concept}>
+                            {concept}
+                          </span>
+                        ))}
+                      </div>
+                      <footer>
+                        <span>{document.repository.replace("modelcontextprotocol/", "")}</span>
+                        <span>{document.wordCount.toLocaleString("en-US")} words</span>
+                      </footer>
+                    </button>
+                  </GlareHover>
                 </Reveal>
               ))}
             </div>

@@ -116,20 +116,25 @@
 
 /* Motion+ Cursor supplies pointer tracking, press states, text sizing, and
    reduced-motion handling. Only the visual skin belongs to MCP Index. */
+/*
+ * A filled disc would sit on top of whatever it hovers, including headline
+ * text, and paint over it. The cursor stays a hollow glowing ring instead,
+ * so the letters underneath its own tip are never blocked.
+ */
 [data-motion-cursor].index-motion-cursor {
   border: 1px solid color-mix(in oklab, white 72%, var(--aqua));
-  background: radial-gradient(circle at 35% 30%, white 0 10%, var(--aqua) 32%, var(--iris) 78%);
+  background: transparent;
   box-shadow:
     0 0 8px color-mix(in oklab, var(--aqua) 78%, transparent),
     0 0 18px color-mix(in oklab, var(--iris) 48%, transparent);
 }
 
 [data-motion-cursor].index-motion-cursor[data-index-cursor="pointer"] {
-  background: color-mix(in oklab, var(--iris) 34%, transparent);
+  background: transparent;
   border-color: color-mix(in oklab, var(--aqua) 72%, white);
   box-shadow:
     0 0 12px color-mix(in oklab, var(--aqua) 54%, transparent),
-    inset 0 0 12px color-mix(in oklab, var(--iris) 34%, transparent);
+    0 0 18px color-mix(in oklab, var(--iris) 34%, transparent);
 }
 
 /* Motion's text mode becomes one luminous caret, not a tiny bordered pill. */
@@ -1304,6 +1309,28 @@ kbd {
 
 .card-grid > * > .card {
   flex: 1;
+}
+
+/* Same shine as the "Four ways in" cards, wrapped around each doc card. */
+.doc-card-glare {
+  isolation: isolate;
+  display: flex;
+  flex: 1;
+}
+
+.doc-card-glare::before {
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* A sibling can never inherit another card's sweep. */
+.card-grid:has(.doc-card-glare:hover) .doc-card-glare:not(:hover)::before {
+  opacity: 0;
+}
+
+.doc-card-glare > .card {
+  flex: 1;
+  width: 100%;
 }
 
 .doc-card {
