@@ -140,6 +140,16 @@
     0 0 18px color-mix(in oklab, var(--iris) 34%, transparent);
 }
 
+/*
+ * plus-lighter only adds light, so against the daybreak theme's near-white
+ * paper it saturates to a faint white smear almost immediately. Multiply
+ * darkens instead, which keeps the same marble vivid against a light page.
+ */
+:root[data-theme="light"] [data-motion-cursor].index-motion-cursor,
+:root[data-theme="light"] [data-motion-cursor].index-motion-cursor[data-index-cursor="pointer"] {
+  mix-blend-mode: multiply;
+}
+
 /* Motion's text mode becomes one luminous caret, not a tiny bordered pill. */
 [data-motion-cursor].index-motion-cursor[data-index-cursor="text"] {
   width: 1px !important;
@@ -573,8 +583,8 @@ kbd {
 }
 
 .rail[data-elevated="true"] {
-  background: color-mix(in oklab, var(--paper) 72%, transparent);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  background: color-mix(in oklab, var(--paper) 42%, transparent);
+  backdrop-filter: blur(calc(var(--glass-blur) * 0.6)) saturate(1.6);
   border-bottom-color: var(--line);
 }
 

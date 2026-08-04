@@ -80,7 +80,7 @@ export function Overview({ stats, documents, onBrowse, onOpen, onAsk }: Overview
             <i className="spark" /> Model Context Protocol · living index
           </span>
           <h1 className="display">
-            The protocol,
+            The MCP protocol,
             <br />
             <em>made navigable.</em>
           </h1>

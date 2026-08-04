@@ -185,6 +185,103 @@ function FullscreenButton({ title, children }: { title: string; children: ReactN
 }
 
 /**
+ * Mirrors the light/dark tokens in globals.css. Mermaid renders its own SVG
+ * fills rather than inheriting CSS, so without this it always draws with its
+ * built-in "default" (light, dark-on-white) palette — illegible once that
+ * SVG sits inside one of this app's dark cards.
+ */
+const mermaidThemeVariables = {
+  dark: {
+    darkMode: true,
+    background: "#0a0c17",
+    primaryColor: "#161a2e",
+    primaryTextColor: "#edeef7",
+    primaryBorderColor: "#343a5c",
+    secondaryColor: "#0f1122",
+    secondaryTextColor: "#edeef7",
+    tertiaryColor: "#1c2036",
+    tertiaryTextColor: "#edeef7",
+    lineColor: "#727890",
+    textColor: "#edeef7",
+    mainBkg: "#161a2e",
+    nodeBorder: "#343a5c",
+    clusterBkg: "#0f1122",
+    clusterBorder: "#343a5c",
+    titleColor: "#edeef7",
+    edgeLabelBackground: "#0a0c17",
+    actorBkg: "#161a2e",
+    actorBorder: "#343a5c",
+    actorTextColor: "#edeef7",
+    actorLineColor: "#727890",
+    signalColor: "#a7acc6",
+    signalTextColor: "#edeef7",
+    labelBoxBkgColor: "#161a2e",
+    labelBoxBorderColor: "#343a5c",
+    labelTextColor: "#edeef7",
+    loopTextColor: "#a7acc6",
+    noteBkgColor: "#3a3320",
+    noteTextColor: "#f5e6c8",
+    noteBorderColor: "#ffc978",
+    activationBkgColor: "#2a2547",
+    activationBorderColor: "#8e7bff",
+    sequenceNumberColor: "#06070e",
+  },
+  light: {
+    darkMode: false,
+    background: "#fdfcfb",
+    primaryColor: "#ffffff",
+    primaryTextColor: "#101120",
+    primaryBorderColor: "#c7c4bd",
+    secondaryColor: "#f4f3f0",
+    secondaryTextColor: "#101120",
+    tertiaryColor: "#eeece7",
+    tertiaryTextColor: "#101120",
+    lineColor: "#666b80",
+    textColor: "#101120",
+    mainBkg: "#ffffff",
+    nodeBorder: "#c7c4bd",
+    clusterBkg: "#f4f3f0",
+    clusterBorder: "#c7c4bd",
+    titleColor: "#101120",
+    edgeLabelBackground: "#fdfcfb",
+    actorBkg: "#ffffff",
+    actorBorder: "#c7c4bd",
+    actorTextColor: "#101120",
+    actorLineColor: "#666b80",
+    signalColor: "#4b4f64",
+    signalTextColor: "#101120",
+    labelBoxBkgColor: "#ffffff",
+    labelBoxBorderColor: "#c7c4bd",
+    labelTextColor: "#101120",
+    loopTextColor: "#4b4f64",
+    noteBkgColor: "#fbf1da",
+    noteTextColor: "#4a3a0c",
+    noteBorderColor: "#a9720a",
+    activationBkgColor: "#ece8fb",
+    activationBorderColor: "#5b45e0",
+    sequenceNumberColor: "#ffffff",
+  },
+} as const;
+
+/** Tracks the `data-theme` the rail's theme toggle stamps on <html>. */
+function useColorTheme() {
+  const [theme, setTheme] = useState<"dark" | "light">(() =>
+    typeof document !== "undefined" && document.documentElement.dataset.theme === "light" ? "light" : "dark",
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => setTheme(root.dataset.theme === "light" ? "light" : "dark");
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
+  return theme;
+}
+
+/**
  * IndexMarkdownCode (below) replaces streamdown's default `code` renderer
  * entirely, which is also what detects and renders mermaid fences — so
  * without this, a ```mermaid block would just show as highlighted text.
@@ -195,13 +292,17 @@ function MermaidDiagram({ code }: { code: string }) {
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const id = `mermaid-${useId().replace(/:/g, "")}`;
+  const theme = useColorTheme();
 
   // The parent keys this component by `code`, so a new diagram is a fresh
-  // mount with fresh initial state — no manual reset needed here.
+  // mount with fresh initial state — no manual reset needed here. Theme also
+  // triggers a re-render, since a diagram already on screen when the reader
+  // flips the toggle should follow it rather than staying stuck in the old
+  // palette.
   useEffect(() => {
     let live = true;
     mermaid
-      .getMermaid()
+      .getMermaid({ theme: "base", themeVariables: mermaidThemeVariables[theme] })
       .render(id, code)
       .then(({ svg: rendered }) => {
         if (live) setSvg(rendered);
@@ -212,7 +313,7 @@ function MermaidDiagram({ code }: { code: string }) {
     return () => {
       live = false;
     };
-  }, [code, id]);
+  }, [code, id, theme]);
 
   // A diagram that fails to parse still has a source worth reading, so
   // fall back to the plain code view rather than showing nothing.
