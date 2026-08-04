@@ -117,20 +117,23 @@
 /* Motion+ Cursor supplies pointer tracking, press states, text sizing, and
    reduced-motion handling. Only the visual skin belongs to MCP Index. */
 /*
- * A filled disc would sit on top of whatever it hovers, including headline
- * text, and paint over it. The cursor stays a hollow glowing ring instead,
- * so the letters underneath its own tip are never blocked.
+ * A plain filled disc sat on top of whatever it hovered, including headline
+ * text, and painted over it at full opacity. plus-lighter only adds light,
+ * so the marble stays glossy while the glyphs underneath always show through
+ * instead of getting erased.
  */
 [data-motion-cursor].index-motion-cursor {
   border: 1px solid color-mix(in oklab, white 72%, var(--aqua));
-  background: transparent;
+  background: radial-gradient(circle at 35% 30%, white 0 10%, var(--aqua) 32%, var(--iris) 78%);
+  mix-blend-mode: plus-lighter;
   box-shadow:
     0 0 8px color-mix(in oklab, var(--aqua) 78%, transparent),
     0 0 18px color-mix(in oklab, var(--iris) 48%, transparent);
 }
 
 [data-motion-cursor].index-motion-cursor[data-index-cursor="pointer"] {
-  background: transparent;
+  background: radial-gradient(circle at 35% 30%, white 0 6%, var(--aqua) 26%, var(--iris) 72%);
+  mix-blend-mode: plus-lighter;
   border-color: color-mix(in oklab, var(--aqua) 72%, white);
   box-shadow:
     0 0 12px color-mix(in oklab, var(--aqua) 54%, transparent),
