@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 import "./mcp-index.css";
@@ -61,6 +62,7 @@ export default function RootLayout({
           {`(function(){try{var t=localStorage.getItem("mcp-index-theme-v1");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}var r=document.documentElement;r.dataset.theme=t;r.classList.toggle("dark",t==="dark");r.style.colorScheme=t}catch(e){}})()`}
         </Script>
         <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
